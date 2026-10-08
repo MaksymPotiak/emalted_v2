@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="EMALTED">
+  <title>EMALTED</title>
+  <mask id="emalted-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
+    <rect width="100" height="100" fill="#fff"/>
+    <polygon points="9,41 58,12.7 58,20.7 9,49" fill="#000"/>
+    <polygon points="9,60 74,22.5 74,30.5 9,68" fill="#000"/>
+  </mask>
+  <g mask="url(#emalted-cut)">
+    <polygon points="50,3 91,26.5 91,73.5 50,97 9,73.5 9,26.5" fill="var(--logo-ink, #1d2024)"/>
+    <polygon points="50,3 91,26.5 91,58 79,51 79,33 50,16" fill="var(--logo-steel, #5a5f66)"/>
+    <polygon points="91,60 91,73.5 50,97 50,84" fill="var(--logo-blue, #1f45a6)"/>
+  </g>
+</svg>

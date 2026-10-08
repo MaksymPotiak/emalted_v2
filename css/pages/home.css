@@ -1,0 +1,373 @@
+/* ==========================================================================
+   Головна — «Мнемосхема»
+   ========================================================================== */
+@layer pages {
+
+  /* --- Hero ---------------------------------------------------------------
+     Телефон: текст, під ним схема.
+     ≥60rem: дві колонки, схема займає більшу частину. */
+  .hero {
+    display: grid;
+    gap: var(--sp-6);
+    padding-block: var(--sp-6) var(--sp-8);
+  }
+  .hero__text { display: grid; gap: var(--sp-5); align-content: center; }
+  .hero__text h1 { max-width: 15ch; hyphens: auto; }
+  .hero__lead { font-size: var(--fs-md); color: var(--c-ink-2); max-width: 44ch; }
+
+  @media (min-width: 60rem) {
+    .hero {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: center;
+      gap: var(--sp-7);
+      padding-block: var(--sp-7) var(--sp-8);
+      min-height: calc(100svh - var(--header-h));
+    }
+  }
+
+  /* --- Панель зі схемою ---------------------------------------------------- */
+  .scheme-panel {
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-panel);
+    background: var(--c-surface);
+    overflow: hidden;
+  }
+  .scheme-panel__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding: var(--sp-2) var(--sp-4);
+    background: var(--c-surface-2);
+    border-bottom: 1px solid var(--c-line);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+  .scheme-panel__state { display: inline-flex; align-items: center; gap: var(--sp-2); color: var(--c-ink-2); }
+
+  .scheme { padding: var(--sp-4) var(--sp-3) var(--sp-2); }
+  .scheme svg { width: 100%; height: auto; overflow: visible; }
+
+  /* Елементи однолінійної схеми */
+  .sl-dead  { fill: none; stroke: var(--c-dead); stroke-width: 3; stroke-linecap: square; }
+  .sl-live  { fill: none; stroke: var(--c-blue); stroke-width: 3; stroke-linecap: square; }
+  .sl-bus   { stroke-width: 7; }
+  .sl-breaker { fill: var(--c-blue); stroke: var(--c-blue); stroke-width: 3; }
+  .sl-ct    { fill: var(--c-surface); stroke: var(--c-blue); stroke-width: 2.5; }
+  .sl-tr { fill: none; stroke: var(--c-blue); stroke-width: 3; }
+  .sl-label { fill: var(--c-ink-2); font: 600 22px var(--f-text); }
+
+  /* Приєднання позначені тонким класом .sl-f1/2/3 — щоб підсвічувати їх
+     з HTML-плиток під схемою через :has() (див. нижче). */
+  .sl-arrow { fill: var(--c-blue); }
+  .sl-f { transition: opacity var(--dur); }
+
+  /* --- Плитки-посилання під схемою -----------------------------------------
+     Три колонки однакової ширини. Приєднання на схемі стоять рівно
+     в центрах цих колонок (x = 100, 300, 500 з 600), тож стрілки
+     схеми «впираються» точно у свою плитку на будь-якій ширині екрана. */
+  .feeders {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-2);
+    padding: 0 var(--sp-3) var(--sp-3);
+  }
+  .feeder-link {
+    display: grid;
+    gap: 0.15rem;
+    justify-items: center;
+    text-align: center;
+    padding: var(--sp-3) var(--sp-2);
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-panel);
+    background: var(--c-bg);
+    color: var(--c-ink);
+    text-decoration: none;
+    transition: background var(--dur), border-color var(--dur), color var(--dur);
+  }
+  .feeder-link strong { font-family: var(--f-display); font-weight: 600; font-size: clamp(0.85rem, 0.7rem + 0.6vw, 1.05rem); }
+  .feeder-link span { font-size: 0.75rem; color: var(--c-ink-2); }
+  .feeder-link:hover,
+  .feeder-link:focus-visible { background: var(--c-blue); border-color: var(--c-blue); color: var(--c-on-blue); }
+  .feeder-link:hover span,
+  .feeder-link:focus-visible span { color: inherit; }
+
+  /* :has() — «батьківський селектор». Навели на плитку → решта
+     приєднань на схемі пригасає, лишається тільки «ваше». */
+  .scheme-panel:has(.feeder-link:hover, .feeder-link:focus-visible) .sl-f { opacity: 0.25; }
+  .scheme-panel:has(.feeder-link:nth-child(1):is(:hover, :focus-visible)) .sl-f1,
+  .scheme-panel:has(.feeder-link:nth-child(2):is(:hover, :focus-visible)) .sl-f2,
+  .scheme-panel:has(.feeder-link:nth-child(3):is(:hover, :focus-visible)) .sl-f3 { opacity: 1; }
+
+  /* Один оркестрований момент на сторінці: схема «стає під напругу»
+     згори вниз — ввід, шина, потім три приєднання по черзі. */
+  @media (prefers-reduced-motion: no-preference) {
+    .sl-live {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: energize 700ms var(--ease-out) forwards;
+      animation-delay: var(--d, 0ms);
+    }
+    .sl-breaker, .sl-ct, .sl-tr {
+      opacity: 0;
+      animation: breaker-close 200ms steps(1, end) forwards;
+      animation-delay: var(--d, 0ms);
+    }
+    .sl-arrow { opacity: 0; animation: breaker-close 200ms steps(1, end) forwards; animation-delay: var(--d, 0ms); }
+  }
+  @keyframes energize { to { stroke-dashoffset: 0; } }
+  @keyframes breaker-close { to { opacity: 1; } }
+
+  /* --- Телевимірювання під схемою ------------------------------------------ */
+  .telemetry {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    border-top: 1px solid var(--c-line);
+  }
+  .telemetry div {
+    padding: var(--sp-3) var(--sp-4);
+    border-right: var(--border);
+    border-bottom: var(--border);
+  }
+  .telemetry div:nth-child(2n) { border-right: 0; }
+  .telemetry dt { font-size: 0.75rem; color: var(--c-ink-2); }
+  .telemetry dd {
+    font-family: var(--f-display);
+    font-size: var(--fs-md);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .telemetry dd small { font-family: var(--f-text); font-size: 0.75rem; font-weight: 600; color: var(--c-ink-2); margin-left: 0.2em; }
+
+  @media (min-width: 40rem) {
+    .telemetry { grid-template-columns: repeat(4, 1fr); }
+    .telemetry div { border-bottom: 0; }
+    .telemetry div:nth-child(2n) { border-right: var(--border); }
+    .telemetry div:last-child { border-right: 0; }
+  }
+
+  /* --- Паспорт компанії -------------------------------------------------- */
+  .passport {
+    display: grid;
+    gap: var(--sp-6);
+  }
+  .passport__intro { display: grid; gap: var(--sp-4); align-content: start; }
+  .passport__intro p { color: var(--c-ink-2); }
+
+  .spec {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .spec div {
+    display: grid;
+    gap: var(--sp-1);
+    padding-block: var(--sp-3);
+    border-bottom: 1px dashed var(--c-line);
+  }
+  .spec div:last-child { border-bottom: 0; }
+  .spec dt { font-size: var(--fs-sm); color: var(--c-ink-2); }
+  .spec dd { font-weight: 700; }
+
+  @media (min-width: 40rem) {
+    .spec div { grid-template-columns: 13rem 1fr; gap: var(--sp-4); align-items: baseline; }
+  }
+  @media (min-width: 60rem) {
+    .passport { grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: var(--sp-7); }
+    .passport__intro { position: sticky; top: calc(var(--header-h) + var(--sp-5)); }
+  }
+
+
+  /* --- Рівні архітектури: три «поверхи» -----------------------------------
+     Телефон: стовпчик. ≥60rem: три колонки з лініями-стрілками між ними. */
+  .tiers { display: grid; gap: var(--sp-4); counter-reset: none; }
+  .tier {
+    position: relative;
+    display: grid;
+    gap: var(--sp-3);
+    align-content: start;
+    padding: var(--sp-5);
+    background: var(--c-surface);
+    border: 1px solid var(--c-line-soft);
+    border-top: 3px solid var(--c-blue);
+    border-radius: var(--r-panel);
+  }
+  .tier p { color: var(--c-ink-2); }
+  @media (min-width: 60rem) {
+    .tiers { grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); }
+    .tier + .tier::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: calc(-1 * var(--sp-6));
+      width: var(--sp-6);
+      height: 2px;
+      background: var(--c-line);
+    }
+  }
+
+  /* --- Картки компонентів: auto-fill + <details> -------------------------- */
+  .units {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: var(--sp-4);
+    align-items: start;
+  }
+  .unit, .pair__item {
+    display: grid;
+    gap: var(--sp-4);
+    padding: var(--sp-5);
+    background: var(--c-surface);
+    border: 1px solid var(--c-line-soft);
+    border-radius: var(--r-panel);
+  }
+  .unit > p { color: var(--c-ink-2); }
+  .unit__head { display: flex; align-items: center; gap: var(--sp-3); }
+  .unit__icon { width: 2.5rem; height: 2.5rem; flex: none; color: var(--c-blue); }
+  .unit__more { border-top: 1px solid var(--c-line-soft); margin-inline: calc(-1 * var(--sp-5)); margin-bottom: calc(-1 * var(--sp-5)); }
+  .unit__more > summary { padding-inline: var(--sp-5); font-size: var(--fs-sm); }
+  .unit__more .kv { padding: 0 var(--sp-5) var(--sp-5); }
+
+  /* --- Пара блоків: безпека і резервування --------------------------------- */
+  .pair { display: grid; gap: var(--sp-4); }
+  .pair__item a { font-weight: 600; }
+  @media (min-width: 60rem) { .pair { grid-template-columns: 1fr 1fr; } }
+
+  /* --- Технічні показники ---------------------------------------------------- */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    border-top: 1px solid var(--c-line);
+    border-left: 1px solid var(--c-line);
+  }
+  .metric {
+    display: flex;
+    flex-direction: column-reverse;   /* у HTML: підпис, потім значення; на екрані — навпаки */
+    justify-content: flex-end;
+    gap: var(--sp-2);
+    padding: var(--sp-5);
+    border-right: 1px solid var(--c-line);
+    border-bottom: 1px solid var(--c-line);
+  }
+  .metric dt { font-weight: 700; }
+  .metric dd { display: grid; gap: var(--sp-1); }
+  .metric__value { font-family: var(--f-display); font-size: var(--fs-xl); font-weight: 500; line-height: 1; }
+  .metric__value small { font-family: var(--f-text); font-size: var(--fs-sm); font-weight: 700; color: var(--c-ink-2); margin-left: 0.3em; }
+  .metric__note { font-size: var(--fs-sm); color: var(--c-ink-2); }
+
+  /* --- Етапи роботи --------------------------------------------------------
+     Телефон: вертикальна «шина» зліва. Десктоп: горизонтальна шина зверху. */
+  .process {
+    position: relative;
+    display: grid;
+    gap: var(--sp-5);
+    counter-reset: step;
+  }
+  .process::before {
+    content: "";
+    position: absolute;
+    left: 1.2rem;
+    top: 1.2rem;
+    bottom: 1.2rem;
+    width: 3px;
+    background: var(--c-blue);
+  }
+  .step {
+    position: relative;
+    display: grid;
+    gap: var(--sp-2);
+    padding-left: 3.6rem;
+    counter-increment: step;
+  }
+  .step::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    background: var(--c-bg);
+    border: 3px solid var(--c-blue);
+    font-family: var(--f-display);
+    font-weight: 600;
+    clip-path: none;
+    border-radius: 50%;
+  }
+  .step h3 { padding-top: 0.45rem; }
+  .step p { color: var(--c-ink-2); }
+  .step__out {
+    font-size: var(--fs-sm);
+    padding: var(--sp-2) var(--sp-3);
+    background: var(--c-surface);
+    border-left: 3px solid var(--c-steel);
+    width: fit-content;
+  }
+
+  @media (min-width: 80rem) {
+    .process {
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--sp-5);
+    }
+    .process::before {
+      left: 1.2rem;
+      right: 1.2rem;
+      top: 1.2rem;
+      bottom: auto;
+      width: auto;
+      height: 3px;
+    }
+    .step { padding-left: 0; padding-top: 3.6rem; align-content: start; }
+    .step h3 { padding-top: 0; }
+  }
+
+  .process { margin-bottom: var(--sp-6); }
+}
+
+/* --- Галерея «Від креслення до підстанції» ----------------------------------
+   Телефон: горизонтальна стрічка з scroll-snap — фото «клацають» на місце.
+   ≥40rem: сітка 2×2. ≥60rem: мозаїка з іменованими областями. */
+@layer pages {
+  .gallery {
+    display: flex;
+    gap: var(--sp-3);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    padding-bottom: var(--sp-3);
+    scrollbar-width: thin;
+  }
+  .gallery__item {
+    flex: 0 0 85%;
+    scroll-snap-align: start;
+  }
+  .gallery__item .photo { aspect-ratio: 4 / 3; height: 100%; }
+  .gallery__hint { margin-top: var(--sp-2); font-size: var(--fs-sm); color: var(--c-ink-2); }
+
+  @media (min-width: 40rem) {
+    .gallery {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: visible;
+      padding-bottom: 0;
+    }
+    .gallery__hint { display: none; }
+  }
+
+  @media (min-width: 60rem) {
+    .gallery {
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-rows: repeat(2, clamp(13rem, 19vw, 17rem));
+      grid-template-areas:
+        "lab desk     desk"
+        "lab workshop site";
+      gap: var(--sp-4);
+    }
+    .gallery__item--lab      { grid-area: lab; }
+    .gallery__item--desk     { grid-area: desk; }
+    .gallery__item--workshop { grid-area: workshop; }
+    .gallery__item--site     { grid-area: site; }
+    .gallery__item { min-height: 0; }
+    .gallery__item .photo { aspect-ratio: auto; height: 100%; }
+  }
+}

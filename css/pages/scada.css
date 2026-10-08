@@ -1,0 +1,343 @@
+/* ==========================================================================
+   Диспетчерська — HMI-панель.
+   Розкладка через grid-template-areas, яка перебудовується на кожній точці:
+     телефон  : все в один стовпчик, у порядку важливості для оператора
+     ≥60rem   : схема і приєднання на всю ширину, керування і тривоги поруч
+     ≥80rem   : тривоги — окрема колонка праворуч на всю висоту схеми
+   ========================================================================== */
+@layer pages {
+
+  .sim-note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+    font-size: var(--fs-sm);
+    color: var(--c-ink-2);
+  }
+
+  .hmi {
+    display: grid;
+    gap: var(--sp-3);
+    padding-bottom: var(--sp-8);
+    grid-template-areas:
+      "status"
+      "sld"
+      "bays"
+      "controls"
+      "alarms"
+      "trends";
+  }
+  .hmi-status   { grid-area: status; }
+  .hmi-sld      { grid-area: sld; }
+  .hmi-bays     { grid-area: bays; }
+  .hmi-controls { grid-area: controls; }
+  .hmi-alarms   { grid-area: alarms; }
+  .hmi-trends   { grid-area: trends; }
+  .hmi > * { min-width: 0; }
+
+  @media (min-width: 60rem) {
+    .hmi {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-areas:
+        "status   status"
+        "sld      sld"
+        "bays     bays"
+        "controls alarms"
+        "trends   trends";
+    }
+  }
+  @media (min-width: 80rem) {
+    .hmi {
+      grid-template-columns: minmax(0, 1fr) 24rem;
+      grid-template-areas:
+        "status   status"
+        "sld      alarms"
+        "bays     alarms"
+        "controls alarms"
+        "trends   trends";
+    }
+  }
+
+  /* --- Панелі ------------------------------------------------------------------ */
+  .hmi-panel {
+    background: var(--c-surface);
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-panel);
+  }
+  .hmi-panel__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-2) var(--sp-4);
+    padding: var(--sp-2) var(--sp-4);
+    min-height: 3rem;
+    background: var(--c-surface-2);
+    border-bottom: 1px solid var(--c-line);
+  }
+  .hmi-panel__bar h2 { font-family: var(--f-text); font-size: var(--fs-sm); font-weight: 800; letter-spacing: 0; }
+
+  /* --- Верхня смуга стану --------------------------------------------------------
+     Flex з переносом: на телефоні комірки стають по дві в ряд, на десктопі — в один. */
+  .hmi-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+    background: var(--c-line);
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-panel);
+    overflow: hidden;
+  }
+  .status-cell {
+    flex: 1 1 calc(50% - 1px);
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--c-surface);
+  }
+  .status-cell small { display: block; font-size: 0.72rem; color: var(--c-ink-2); }
+  .status-cell strong { font-family: var(--f-display); font-weight: 500; font-size: var(--fs-base); font-variant-numeric: tabular-nums; }
+  .status-cell--clock { justify-content: flex-start; }
+  @media (min-width: 60rem) {
+    .status-cell { flex: 1 1 0; }
+  }
+  @media (max-width: 23.99rem) {
+    .status-cell { flex-basis: 100%; }
+  }
+
+  /* --- Мнемосхема --------------------------------------------------------------- */
+  .sld { width: 100%; height: auto; padding: var(--sp-3); }
+  .hmi-legend { display: flex; gap: var(--sp-4); font-size: 0.75rem; color: var(--c-ink-2); }
+  .key { display: inline-flex; align-items: center; gap: var(--sp-2); }
+  .key::before { content: ""; width: 1.2rem; height: 3px; background: var(--c-dead); }
+  .key--live::before { background: var(--c-blue); }
+
+  .hmi-line { fill: none; stroke: var(--c-dead); stroke-width: 4; stroke-linecap: square; transition: stroke var(--dur); }
+  .hmi-bus  { stroke-width: 8; }
+  .hmi-line.is-live, .hmi-tr.is-live { stroke: var(--c-blue); }
+  .hmi-arrow { fill: var(--c-dead); transition: fill var(--dur); }
+  .hmi-arrow.is-live { fill: var(--c-blue); }
+  .hmi-tr { fill: none; stroke: var(--c-dead); stroke-width: 4; transition: stroke var(--dur); }
+
+  .hmi-tag   { fill: var(--c-ink); font: 700 17px var(--f-text); }
+  .hmi-tag--big { font: 600 19px var(--f-display); }
+  .hmi-value { fill: var(--c-ink); font: 600 18px var(--f-text); font-variant-numeric: tabular-nums; }
+  .hmi-value--muted, .hmi-state { fill: var(--c-ink-2); }
+  .hmi-state { font: 800 14px var(--f-text); }
+
+  /* Телефон: схема зменшується разом з екраном, тож шрифти всередині SVG
+     збільшуємо медіазапитом, а стан «ВКЛ/ВИКЛ» показують картки приєднань. */
+  @media (max-width: 39.99rem) {
+    .sld { padding: var(--sp-2); }
+    .hmi-tag { font-size: 26px; }
+    .hmi-tag--big { font-size: 27px; }
+    .hmi-value { font-size: 25px; }
+    .hmi-value--muted, .hmi-state { display: none; }
+  }
+
+  /* Вимикач: залитий квадрат — увімкнений, контур — вимкнений, червоний — відключений захистом */
+  .hmi-breaker { cursor: pointer; outline: none; }
+  .hmi-breaker__hit { fill: transparent; }
+  .hmi-breaker__body { fill: var(--c-surface); stroke: var(--c-ink-2); stroke-width: 3; transition: fill var(--dur), stroke var(--dur); }
+  .hmi-breaker[data-state="closed"] .hmi-breaker__body { fill: var(--c-blue); stroke: var(--c-blue); }
+  .hmi-breaker[data-state="tripped"] .hmi-breaker__body { stroke: var(--c-danger); }
+  .hmi-breaker[data-state="tripped"] .hmi-state { fill: var(--c-danger); }
+  .hmi-breaker:hover .hmi-breaker__hit,
+  .hmi-breaker:focus-visible .hmi-breaker__hit { fill: color-mix(in srgb, var(--c-blue) 14%, transparent); stroke: var(--c-blue); stroke-width: 2; }
+  @media (prefers-reduced-motion: no-preference) {
+    .hmi-breaker[data-state="tripped"] .hmi-breaker__body { animation: lamp-blink 1.2s steps(2, jump-none) infinite; }
+  }
+
+  /* --- Приєднання (дублює схему великими елементами для дотику) ---------------- */
+  .bays {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+    gap: var(--sp-3);
+    padding: var(--sp-3);
+  }
+  .bay {
+    display: grid;
+    gap: var(--sp-2);
+    padding: var(--sp-3);
+    background: var(--c-bg);
+    border: 1px solid var(--c-line-soft);
+    border-radius: var(--r-panel);
+  }
+  .bay__head { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-2); }
+  .bay h3 { font-size: var(--fs-base); }
+  .bay h3 span { font-family: var(--f-text); font-size: var(--fs-sm); font-weight: 600; color: var(--c-ink-2); margin-left: 0.3em; }
+  .bay__sub { font-size: 0.78rem; color: var(--c-ink-2); }
+  .bay__values { display: flex; gap: var(--sp-4); font-size: var(--fs-sm); }
+  .bay__values div { display: flex; gap: var(--sp-1); }
+  .bay__values dt { color: var(--c-ink-2); }
+  .bay__values dd { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .bay:has(.state-pill[data-state="tripped"]) { border-color: var(--c-danger); }
+
+  /* --- Керування ------------------------------------------------------------------ */
+  .controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--sp-4);
+    padding: var(--sp-4);
+  }
+  .control-group { border: 0; padding: 0; display: grid; gap: var(--sp-2); align-content: start; }
+  .control-group legend { font-weight: 800; font-size: var(--fs-sm); margin-bottom: var(--sp-2); }
+  .control-group--wide { grid-column: 1 / -1; }
+  .control-hint { font-size: 0.78rem; color: var(--c-ink-2); }
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
+    gap: var(--sp-2);
+  }
+
+  /* --- Тривоги і журнал ----------------------------------------------------------- */
+  .hmi-alarms { display: flex; flex-direction: column; }
+  .hmi-alarms .tabs { padding: 0 var(--sp-4) var(--sp-4); display: flex; flex-direction: column; flex: 1; min-height: 0; }
+  .hmi-alarms .tabs__panel { padding-top: var(--sp-3); }
+  .count {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.4rem;
+    margin-left: var(--sp-1);
+    padding: 0 0.3rem;
+    border-radius: var(--r-control);
+    background: var(--c-surface-2);
+    font-size: 0.72rem;
+  }
+
+  .alarm-list, .event-log {
+    display: grid;
+    gap: var(--sp-2);
+    max-height: 26rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  /* ≥80rem панель тривог «липне» до верху екрана: оператор бачить
+     тривоги, навіть коли прокрутив сторінку до приєднань чи керування. */
+  @media (min-width: 80rem) {
+    .hmi-alarms {
+      position: sticky;
+      top: calc(var(--header-h) + var(--sp-3));
+      align-self: start;
+      max-height: calc(100svh - var(--header-h) - var(--sp-6));
+    }
+    .hmi-alarms .tabs__panel:not([hidden]) { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+    .alarm-list, .event-log { max-height: none; flex: 1; min-height: 0; }
+  }
+
+  .alarm {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--sp-1) var(--sp-3);
+    align-items: center;
+    padding: var(--sp-2) var(--sp-3);
+    border: 1px solid var(--c-line-soft);
+    border-left: 4px solid var(--c-alarm);
+    border-radius: var(--r-panel);
+    background: var(--c-bg);
+    font-size: var(--fs-sm);
+  }
+  .alarm[data-prio="ALARM"] { border-left-color: var(--c-danger); }
+  .alarm[data-acked="false"] { background: color-mix(in srgb, var(--c-alarm) 8%, var(--c-bg)); }
+  .alarm[data-prio="ALARM"][data-acked="false"] { background: color-mix(in srgb, var(--c-danger) 10%, var(--c-bg)); }
+  .alarm__text { grid-column: 1 / 3; }
+  .alarm__meta { font-size: 0.75rem; color: var(--c-ink-2); font-variant-numeric: tabular-nums; }
+  .alarm .btn { grid-row: 1 / 3; grid-column: 3; }
+  .alarm__state { font-size: 0.72rem; font-weight: 700; color: var(--c-ink-2); }
+
+  .prio { font-size: 0.7rem; font-weight: 800; padding: 0 0.35rem; border-radius: 2px; border: 1px solid currentColor; }
+  .prio--ALARM   { color: var(--c-danger); }
+  .prio--WARNING { color: var(--c-alarm); }
+  .prio--INFO    { color: var(--c-ink-2); }
+
+  .log-filter { border: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sp-4); font-size: var(--fs-sm); font-weight: 700; }
+  .log-filter label { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: 2.5rem; cursor: pointer; }
+  .log-filter input { width: 1.1rem; height: 1.1rem; accent-color: var(--c-blue); }
+
+  .event-log li {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: var(--sp-2);
+    align-items: baseline;
+    padding: var(--sp-1) 0;
+    border-bottom: 1px solid var(--c-line-soft);
+    font-size: 0.8rem;
+  }
+  .event-log time { color: var(--c-ink-2); font-variant-numeric: tabular-nums; }
+  /* фільтр журналу: CSS ховає рядки, чиї пріоритети не відмічені */
+  .hmi-alarms:has(.log-filter input[value="ALARM"]:not(:checked))   .event-log [data-prio="ALARM"],
+  .hmi-alarms:has(.log-filter input[value="WARNING"]:not(:checked)) .event-log [data-prio="WARNING"],
+  .hmi-alarms:has(.log-filter input[value="INFO"]:not(:checked))    .event-log [data-prio="INFO"] { display: none; }
+
+  .empty { font-size: var(--fs-sm); color: var(--c-ink-2); }
+  .alarm-list:not(:empty) + .empty { display: none; }
+
+  /* --- Тренди --------------------------------------------------------------------- */
+  .trends {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: var(--sp-3);
+    padding: var(--sp-3);
+  }
+  .trend {
+    display: grid;
+    gap: var(--sp-2);
+    padding: var(--sp-3);
+    background: var(--c-bg);
+    border: 1px solid var(--c-line-soft);
+    border-radius: var(--r-panel);
+  }
+  .trend figcaption { display: flex; justify-content: space-between; gap: var(--sp-2); font-size: var(--fs-sm); color: var(--c-ink-2); }
+  .trend figcaption strong { color: var(--c-ink); font-variant-numeric: tabular-nums; }
+  .trend canvas { width: 100%; height: 8.5rem; }
+  @media (max-width: 23.99rem) { .trend canvas { height: 7rem; } }
+
+  /* --- Діалог команди -------------------------------------------------------------- */
+  .cmd-dialog {
+    margin: auto;   /* reset «* { margin: 0 }» прибирає браузерне центрування <dialog> */
+    width: min(34rem, calc(100% - 2rem));
+    max-height: calc(100svh - 2rem);
+    padding: 0;
+    color: var(--c-ink);
+    background: var(--c-surface);
+    border: 1px solid var(--c-line);
+    border-top: 4px solid var(--c-blue);
+    border-radius: var(--r-panel);
+  }
+  .cmd-dialog::backdrop { background: rgb(0 0 0 / 0.55); }
+  .cmd { display: grid; gap: var(--sp-3); padding: var(--sp-5); }
+  .cmd__head { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-3); }
+  .cmd__head h2 { font-size: var(--fs-lg); }
+  .cmd__close {
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-panel);
+    background: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .cmd__sub { color: var(--c-ink-2); font-size: var(--fs-sm); }
+  .cmd h3 { font-family: var(--f-text); font-size: var(--fs-sm); font-weight: 800; letter-spacing: 0; }
+  .cond-list { display: grid; gap: var(--sp-1); font-size: var(--fs-sm); }
+  .cond-list li { display: flex; align-items: center; gap: var(--sp-2); }
+  .cond-list li[data-ok="true"] .lamp { background: var(--c-ok); }
+  .cond-list li[data-ok="false"] { color: var(--c-alarm); font-weight: 700; }
+  .cond-list li[data-ok="false"] .lamp { background: var(--c-alarm); }
+
+  .cmd__sim { display: grid; gap: var(--sp-1); padding: var(--sp-3); border: 1px dashed var(--c-line); border-radius: var(--r-panel); font-size: var(--fs-sm); }
+  .cmd__sim legend { padding: 0 var(--sp-1); font-weight: 700; color: var(--c-ink-2); }
+  .cmd__sim label { display: flex; align-items: center; gap: var(--sp-2); min-height: 2.25rem; cursor: pointer; }
+  .cmd__sim input { width: 1.1rem; height: 1.1rem; accent-color: var(--c-blue); }
+  .cmd__sim[hidden] { display: none; }
+
+  .cmd__msg { min-height: 1.5em; font-weight: 700; font-size: var(--fs-sm); }
+  .cmd__msg[data-tone="bad"] { color: var(--c-alarm); }
+  .cmd__msg[data-tone="good"] { color: var(--c-ok); }
+  .cmd__actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+  .cmd__actions .btn { flex: 1 1 10rem; }
+  .cmd__hint { font-size: 0.78rem; color: var(--c-ink-2); }
+}

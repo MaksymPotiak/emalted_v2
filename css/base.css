@@ -1,0 +1,135 @@
+/* ==========================================================================
+   Скидання і базова типографіка
+   ========================================================================== */
+/* Шрифти лежать у репозиторії (самостійний хостинг): без запитів до
+   Google, швидше і без передачі IP відвідувачів третій стороні.
+   Обрізані до латиниці й кирилиці, змінна вага в одному файлі. */
+@font-face {
+  font-family: "Unbounded";
+  src: url("../fonts/unbounded-var.woff2") format("woff2");
+  font-weight: 200 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Manrope";
+  src: url("../fonts/manrope-var.woff2") format("woff2");
+  font-weight: 200 800;
+  font-display: swap;
+}
+
+@layer reset {
+  *, *::before, *::after { box-sizing: border-box; }
+  * { margin: 0; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { min-height: 100svh; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  img, picture, svg, video { display: block; max-width: 100%; }
+  img { height: auto; }
+  input, button, textarea, select { font: inherit; color: inherit; }
+  p, h1, h2, h3, h4, li, dd { overflow-wrap: break-word; }
+  ul[role="list"], ol[role="list"] { list-style: none; padding: 0; }
+  table { border-collapse: collapse; }
+}
+
+@layer base {
+  :root[data-theme="light"] { color-scheme: light; }
+
+  html {
+    scroll-behavior: smooth;
+    /* щоб якорі не ховалися під липкою шапкою */
+    scroll-padding-top: calc(var(--header-h) + var(--sp-4));
+  }
+
+  body {
+    font-family: var(--f-text);
+    font-size: var(--fs-base);
+    font-feature-settings: "tnum" 1;   /* табличні цифри: телевимірювання не «стрибають» */
+    color: var(--c-ink);
+    background: var(--c-bg);
+    display: flex;
+    flex-direction: column;
+  }
+
+  main { flex: 1; }
+
+  h1, h2, h3 {
+    font-family: var(--f-display);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  h1 { font-size: var(--fs-2xl); }
+  h2 { font-size: var(--fs-xl); }
+  h3 { font-size: var(--fs-md); letter-spacing: -0.01em; line-height: 1.2; }
+
+  p { text-wrap: pretty; max-width: var(--measure); }
+
+  a {
+    color: var(--c-blue);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+  a:hover { text-decoration-thickness: 2px; }
+
+  strong { font-weight: 700; }
+
+  ::selection { background: var(--c-blue); color: var(--c-on-blue); }
+
+  /* Видимий фокус для клавіатури — і тільки для неї */
+  :focus-visible {
+    outline: 3px solid var(--c-blue);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Посилання «Перейти до змісту» для клавіатури і скрінрідерів */
+  .skip-link {
+    position: absolute;
+    left: var(--sp-4);
+    top: -10rem;
+    z-index: 100;
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--c-blue);
+    color: var(--c-on-blue);
+    font-weight: 700;
+    border-radius: var(--r-panel);
+  }
+  .skip-link:focus { top: var(--sp-4); }
+}
+
+@layer utilities {
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* ==========================================================================
+   Переходи між сторінками (cross-document View Transitions).
+   Браузер сам «перетікає» між index → services → contact без жодного JS.
+   Де не підтримується — сторінки просто відкриваються як звичайно.
+   ========================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+
+  ::view-transition-old(root) { animation: 180ms var(--ease-out) both vt-out; }
+  ::view-transition-new(root) { animation: 260ms var(--ease-out) both vt-in; }
+
+  @keyframes vt-out { to   { opacity: 0; transform: translateY(-6px); } }
+  @keyframes vt-in  { from { opacity: 0; transform: translateY(8px); } }
+}
+
+/* Хто попросив систему зменшити рух — отримує статичний сайт */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

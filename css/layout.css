@@ -1,0 +1,277 @@
+/* ==========================================================================
+   Каркас: контейнер, шапка, навігація, підвал.
+   Mobile-first: базові стилі — для телефона, медіазапити додають більше.
+
+   Точки зламу (див. README):
+     < 24rem (384px) — малий телефон: компактніші вкладки й відступи
+     40rem  (640px)  — великий телефон / маленький планшет
+     60rem  (960px)  — планшет у landscape і ноутбук: меню переходить у шапку
+     80rem  (1280px) — широкий десктоп: бічні панелі, диспетчерська на 2 колонки
+   ========================================================================== */
+@layer layout {
+
+  .container {
+    width: min(100% - 2 * var(--gutter), var(--max-width));
+    margin-inline: auto;
+  }
+
+  .section { padding-block: var(--sp-8); }
+  .section--tight { padding-block: var(--sp-7); }
+  .section + .section { border-top: var(--border); }
+
+  /* ---------------------------------------------------------------------
+     Шапка
+     --------------------------------------------------------------------- */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: var(--border);
+    view-transition-name: site-header;  /* шапка не «блимає» при переході */
+  }
+  /* Фон шапки — на псевдоелементі. Свідомо без backdrop-filter:
+     він робить елемент контейнером для position: fixed, і нижня панель
+     вкладок «прилипла» б до шапки, а не до низу екрана (баг, знайдений
+     при тестуванні на телефоні). */
+  .site-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--c-bg);
+  }
+
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    min-height: var(--header-h);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-3);
+    color: var(--c-ink);
+    text-decoration: none;
+  }
+  .brand__mark { width: 2.25rem; height: 2.25rem; flex: none; }
+  .brand__name {
+    font-family: var(--f-display);
+    font-weight: 600;
+    font-size: 1.15rem;
+    letter-spacing: 0.04em;
+  }
+
+  .header-tools { display: flex; align-items: center; gap: var(--sp-3); }
+
+  /* Лінія прогресу прокрутки під шапкою — як шина, що «заряджається».
+     Працює на CSS scroll-driven animations; без підтримки просто не видно. */
+  .bus-progress {
+    position: absolute;
+    inset: auto 0 -1px 0;
+    height: 3px;
+    background: var(--c-blue);
+    transform-origin: left center;
+    transform: scaleX(0);
+  }
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .bus-progress {
+        animation: bus-charge linear both;
+        animation-timeline: scroll(root block);
+      }
+    }
+  }
+  @keyframes bus-charge { to { transform: scaleX(1); } }
+
+  /* ---------------------------------------------------------------------
+     Навігація.
+     Один і той самий <nav> у HTML. На телефоні CSS перетворює його на
+     нижню панель вкладок (як у мобільному HMI-терміналі), на десктопі —
+     на звичайне меню в шапці. Жодного «бургера» і жодного JS.
+     --------------------------------------------------------------------- */
+  .site-nav {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 60;
+    background: var(--c-surface);
+    border-top: 1px solid var(--c-line);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    view-transition-name: site-nav;
+  }
+
+  .site-nav__list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    min-height: var(--tabbar-h);
+  }
+
+  .site-nav__link {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    padding: var(--sp-2);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--c-ink-2);
+    text-decoration: none;
+  }
+  .site-nav__icon { width: 1.5rem; height: 1.5rem; }
+
+  /* Активна сторінка: синя «шина» над вкладкою */
+  .site-nav__link[aria-current="page"] { color: var(--c-blue); }
+  .site-nav__link[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    inset: -1px 22% auto;
+    height: 3px;
+    background: var(--c-blue);
+  }
+
+  /* місце під нижню панель, щоб вона не перекривала підвал */
+  body { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px)); }
+
+  @media (min-width: 60rem) {
+    body { padding-bottom: 0; }
+
+    .site-nav {
+      position: static;
+      background: none;
+      border: 0;
+      padding: 0;
+    }
+    .site-nav__list {
+      display: flex;
+      gap: var(--sp-1);
+      min-height: auto;
+    }
+    .site-nav__link {
+      flex-direction: row;
+      gap: var(--sp-2);
+      padding: var(--sp-2) var(--sp-4);
+      font-size: var(--fs-sm);
+      color: var(--c-ink);
+    }
+    .site-nav__icon { width: 1.15rem; height: 1.15rem; }
+    .site-nav__link:hover { color: var(--c-blue); }
+    .site-nav__link[aria-current="page"]::before {
+      inset: auto var(--sp-4) 0;
+      height: 2px;
+    }
+
+    /* шапка: логотип | меню | інструменти */
+    .site-header__inner {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+    }
+    .header-tools { justify-self: end; }
+  }
+
+  /* ---------------------------------------------------------------------
+     Заголовок внутрішніх сторінок
+     --------------------------------------------------------------------- */
+  .page-head {
+    padding-block: var(--sp-7) var(--sp-6);
+    display: grid;
+    gap: var(--sp-4);
+  }
+  .page-head__lead {
+    font-size: var(--fs-md);
+    color: var(--c-ink-2);
+    max-width: 52ch;
+  }
+  .page-head h1 { view-transition-name: page-title; }
+
+  .breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    font-size: var(--fs-sm);
+    color: var(--c-ink-2);
+  }
+  .breadcrumbs li + li::before { content: "/"; margin-right: var(--sp-2); color: var(--c-line); }
+
+  /* ---------------------------------------------------------------------
+     Підвал: про проєкт, сторінки, автор, блок ревізії (як штамп креслення)
+     --------------------------------------------------------------------- */
+  .site-footer {
+    background: var(--c-surface);
+    border-top: 1px solid var(--c-line);
+    padding-block: var(--sp-7) var(--sp-5);
+    font-size: var(--fs-sm);
+    color: var(--c-ink-2);
+  }
+
+  .footer-grid {
+    display: grid;
+    gap: var(--sp-6);
+    grid-template-columns: 1fr;
+  }
+  .footer-grid h2 {
+    font-family: var(--f-text);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    letter-spacing: 0;
+    color: var(--c-ink);
+    margin-bottom: var(--sp-3);
+  }
+  .footer-grid ul { display: grid; gap: var(--sp-2); }
+  .footer-grid a { color: inherit; }
+  .footer-grid a:hover { color: var(--c-blue); }
+
+  .footer-about { display: grid; gap: var(--sp-3); align-content: start; }
+  .footer-about .brand { color: var(--c-ink); }
+  .footer-note {
+    padding-left: var(--sp-3);
+    border-left: 2px solid var(--c-alarm);
+    font-size: 0.8rem;
+  }
+
+  /* Блок ревізії — рамка-«штамп», як у кутку інженерного креслення */
+  .revision {
+    display: grid;
+    border: 1px solid var(--c-line);
+  }
+  .revision div {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    border-bottom: 1px solid var(--c-line-soft);
+  }
+  .revision div:last-child { border-bottom: 0; }
+  .revision dt { padding: 0.3rem 0.5rem; border-right: 1px solid var(--c-line-soft); }
+  .revision dd { padding: 0.3rem 0.5rem; color: var(--c-ink); font-weight: 700; }
+
+  .footer-bottom {
+    margin-top: var(--sp-6);
+    padding-top: var(--sp-4);
+    border-top: var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-3);
+  }
+
+  @media (min-width: 40rem) {
+    .footer-grid { grid-template-columns: repeat(2, 1fr); }
+    .footer-about { grid-column: 1 / -1; }
+  }
+  @media (min-width: 60rem) {
+    .footer-grid { grid-template-columns: 1.6fr 1fr 1fr 1.2fr; }
+    .footer-about { grid-column: auto; }
+  }
+
+  /* ---------------------------------------------------------------------
+     Малий телефон (< 24rem): компактніші вкладки і відступи
+     --------------------------------------------------------------------- */
+  @media (max-width: 23.99rem) {
+    :root { --gutter: 0.85rem; }
+    .site-nav__link { font-size: 0.7rem; padding-inline: var(--sp-1); }
+    .brand__name { font-size: 1rem; }
+    .header-tools { gap: var(--sp-2); }
+  }
+}

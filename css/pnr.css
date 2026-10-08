@@ -1,0 +1,107 @@
+/* ==========================================================================
+   «Режим ПНР» — сайт показує власну верстку.
+   На підстанції під час пусконалагодження перевіряють кожен сигнал.
+   Тут вмикаєш тумблер і бачиш кожну Grid-сітку з її реальними колонками,
+   кожен Flex-контейнер і точку зламу, яка спрацювала саме зараз.
+   Рамки малює js/app.js, а назву точки зламу — чистий CSS (див. .pnr-bp).
+   ========================================================================== */
+@layer components {
+
+  /* --- Кнопка в шапці --------------------------------------------------- */
+  .pnr-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-height: 2.1rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-control);
+    background: var(--c-surface);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .pnr-switch svg { width: 1.1rem; height: 1.1rem; }
+  .pnr-switch[aria-pressed="true"] { background: var(--c-alarm); border-color: var(--c-alarm); color: #1d2024; }
+  .pnr-switch__text { display: none; }
+  @media (min-width: 40rem) { .pnr-switch__text { display: inline; } }
+
+  /* --- Шар з рамками ------------------------------------------------------ */
+  .pnr-overlay {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    z-index: 40;
+    pointer-events: none;
+  }
+  .pnr-box {
+    position: absolute;
+    outline: 1.5px dashed var(--pnr-c);
+    outline-offset: -1px;
+  }
+  .pnr-box--grid { --pnr-c: var(--c-blue); }
+  .pnr-box--flex { --pnr-c: var(--c-alarm); }
+
+  .pnr-col {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: color-mix(in srgb, var(--c-blue) 9%, transparent);
+    border-inline: 1px solid color-mix(in srgb, var(--c-blue) 35%, transparent);
+  }
+
+  .pnr-tag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateY(-100%);
+    padding: 0.05rem 0.4rem;
+    background: var(--pnr-c);
+    color: #fff;
+    font: 700 0.68rem/1.5 var(--f-text);
+    white-space: nowrap;
+    border-radius: 2px 2px 0 0;
+  }
+  .pnr-box--flex .pnr-tag { color: #1d2024; }
+
+  /* --- Табло ---------------------------------------------------------------- */
+  .pnr-panel {
+    position: fixed;
+    left: var(--sp-3);
+    bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + var(--sp-3));
+    z-index: 70;
+    width: min(17rem, calc(100% - 2 * var(--sp-3)));
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--c-ink);
+    color: var(--c-bg);
+    border-left: 4px solid var(--c-alarm);
+    border-radius: var(--r-panel);
+    font-size: 0.8rem;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+  }
+  .pnr-panel[hidden] { display: none; }
+  .pnr-panel__title { display: flex; align-items: center; gap: var(--sp-2); font-weight: 800; margin-bottom: var(--sp-2); }
+  .pnr-panel dl { display: grid; gap: 0.2rem; }
+  .pnr-panel dl div { display: flex; justify-content: space-between; gap: var(--sp-3); }
+  .pnr-panel dt { color: color-mix(in srgb, var(--c-bg) 65%, transparent); }
+  .pnr-panel dd { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+  .pnr-panel__legend { display: flex; gap: var(--sp-4); margin-top: var(--sp-2); padding-top: var(--sp-2); border-top: 1px solid color-mix(in srgb, var(--c-bg) 20%, transparent); }
+  .pnr-panel__legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
+  .pnr-panel__legend span::before { content: ""; width: 0.9rem; height: 0.6rem; outline: 1.5px dashed currentColor; }
+  .pnr-key-grid { color: var(--c-blue-hi); }
+  .pnr-key-flex { color: var(--c-alarm); }
+
+  @media (min-width: 60rem) {
+    .pnr-panel { bottom: var(--sp-4); left: var(--sp-4); }
+  }
+
+  /* Назву точки зламу пише не JS, а самі медіазапити — ті самі значення,
+     що й у layout.css. Тягнеш вікно — напис змінюється в ту ж мить,
+     коли перебудовується сторінка. */
+  .pnr-bp::after { content: "телефон, < 40rem"; }
+  @media (min-width: 40rem) { .pnr-bp::after { content: "планшет, ≥ 40rem"; } }
+  @media (min-width: 60rem) { .pnr-bp::after { content: "десктоп, ≥ 60rem"; } }
+  @media (min-width: 80rem) { .pnr-bp::after { content: "широкий, ≥ 80rem"; } }
+}
+
+@media print { .pnr-overlay, .pnr-panel, .pnr-switch { display: none !important; } }

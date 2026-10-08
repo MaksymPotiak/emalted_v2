@@ -1,0 +1,400 @@
+/* ==========================================================================
+   Компоненти, які повторюються на кількох сторінках
+   ========================================================================== */
+@layer components {
+
+  /* --- Кнопки ----------------------------------------------------------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    min-height: 3rem;
+    padding: var(--sp-3) var(--sp-5);
+    border: 2px solid var(--c-blue);
+    border-radius: var(--r-panel);
+    background: var(--c-blue);
+    color: var(--c-on-blue);
+    font-weight: 700;
+    font-size: var(--fs-base);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--dur), border-color var(--dur), color var(--dur);
+  }
+  .btn:hover { background: var(--c-blue-hi); border-color: var(--c-blue-hi); }
+
+  .btn--ghost {
+    background: transparent;
+    color: var(--c-ink);
+    border-color: var(--c-line);
+  }
+  .btn--ghost:hover { background: var(--c-surface-2); border-color: var(--c-ink-2); }
+
+  .btn-row { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+  .btn-row--tight { gap: var(--sp-2); }
+
+  .btn--small { min-height: 2.75rem; padding: var(--sp-2) var(--sp-4); font-size: var(--fs-sm); }
+  .btn--danger { background: transparent; color: var(--c-danger); border-color: var(--c-danger); }
+  .btn--danger:hover, .btn--danger[aria-pressed="true"] { background: var(--c-danger); border-color: var(--c-danger); color: #fff; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* --- Перемикач теми: тумблер «День / Ніч» ------------------------------ */
+  .theme-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: 0.3rem 0.35rem 0.3rem 0.75rem;
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-control);
+    background: var(--c-surface);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .theme-switch__track {
+    position: relative;
+    width: 2.6rem;
+    height: 1.4rem;
+    border-radius: var(--r-control);
+    background: var(--c-surface-2);
+    box-shadow: inset 0 0 0 1px var(--c-line);
+  }
+  .theme-switch__knob {
+    position: absolute;
+    top: 0.2rem;
+    left: 0.2rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--c-ink);
+    transition: transform var(--dur) var(--ease-out);
+  }
+  .theme-switch[aria-pressed="true"] .theme-switch__knob { transform: translateX(1.2rem); background: var(--c-blue); }
+  /* підпис ховаємо на вузьких екранах — лишається тумблер з aria-label */
+  .theme-switch__text { display: none; }
+  @media (min-width: 40rem) { .theme-switch__text { display: inline; } }
+
+  /* --- Заголовок секції ---------------------------------------------------- */
+  .section-head {
+    display: grid;
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-6);
+  }
+  .section-head p { color: var(--c-ink-2); font-size: var(--fs-md); }
+
+  @media (min-width: 60rem) {
+    .section-head--split {
+      grid-template-columns: 1fr 1fr;
+      align-items: end;
+      gap: var(--sp-6);
+    }
+  }
+
+  /* --- Лампа стану (сигналізація) -------------------------------------------
+     Колір — тільки коли є що сказати: норма спокійна, увага світиться. */
+  .lamp {
+    display: inline-block;
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 50%;
+    background: var(--c-dead);
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.25);
+    flex: none;
+  }
+  .lamp--on    { background: var(--c-ok); }
+  .lamp--alarm { background: var(--c-alarm); }
+  .lamp--blue  { background: var(--c-blue); }
+  .lamp--danger { background: var(--c-danger); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lamp--blink { animation: lamp-blink 1.2s steps(2, jump-none) infinite; }
+    .lamp--alarm { animation: lamp-blink 1.2s steps(2, jump-none) infinite; }
+  }
+  @keyframes lamp-blink { 50% { opacity: 0.25; } }
+
+  /* --- Табличка-шильдик (nameplate) ---------------------------------------
+     Металева табличка з чотирма «гвинтами» по кутах — так виглядає
+     паспорт будь-якої шафи чи терміналу на підстанції. */
+  .nameplate {
+    position: relative;
+    padding: var(--sp-6) var(--sp-5);
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-panel);
+    --screw: radial-gradient(circle at center, var(--c-line) 0 2.5px, var(--c-surface-2) 3px 5px, transparent 5.5px);
+    background-image:
+      var(--screw), var(--screw), var(--screw), var(--screw),
+      linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 92%, white), var(--c-surface));
+    background-size: 12px 12px, 12px 12px, 12px 12px, 12px 12px, auto;
+    background-position: 8px 8px, calc(100% - 8px) 8px, 8px calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), 0 0;
+    background-repeat: no-repeat;
+  }
+
+  /* --- Панель-заклик (CTA) ------------------------------------------------- */
+  .cta-panel {
+    display: grid;
+    gap: var(--sp-5);
+    padding: clamp(var(--sp-5), 4vw, var(--sp-7));
+    background: var(--c-ink);
+    color: var(--c-bg);
+    border-radius: var(--r-panel);
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-panel h2 { font-size: var(--fs-lg); max-width: 22ch; }
+  .cta-panel p { color: color-mix(in srgb, var(--c-bg) 78%, transparent); }
+  .cta-panel .btn { background: var(--c-bg); border-color: var(--c-bg); color: var(--c-ink); justify-self: start; }
+  .cta-panel .btn:hover { background: var(--c-surface-2); border-color: var(--c-surface-2); }
+
+  /* діагональний синій клин — той самий, що на фірмовій папці */
+  .cta-panel::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 auto;
+    width: min(55%, 26rem);
+    height: 100%;
+    background: var(--c-blue);
+    clip-path: polygon(100% 18%, 100% 100%, 8% 100%);
+    opacity: 0.9;
+    pointer-events: none;
+  }
+  .cta-panel > * { position: relative; z-index: 1; }
+
+  @media (min-width: 60rem) {
+    .cta-panel { grid-template-columns: 1.3fr 1fr; align-items: center; }
+    .cta-panel .btn { justify-self: end; }
+  }
+
+  /* --- Адаптивне зображення з підписом ------------------------------------- */
+  .photo {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--r-panel);
+    background: var(--c-surface-2);
+  }
+  .photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .photo figcaption {
+    position: absolute;
+    left: var(--sp-3);
+    bottom: var(--sp-3);
+    padding: 0.3rem 0.6rem;
+    background: color-mix(in srgb, var(--c-ink) 82%, transparent);
+    color: var(--c-bg);
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: var(--r-panel);
+  }
+
+
+  /* --- Бейджі протоколів і станів ------------------------------------------- */
+  .badges { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.55rem;
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-panel);
+    background: var(--c-bg);
+    color: var(--c-ink-2);
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .badge--strong { color: var(--c-ink); border-color: var(--c-steel); }
+  .badge--alarm  { color: var(--c-alarm);  border-color: var(--c-alarm); }
+  .badge--danger { color: var(--c-danger); border-color: var(--c-danger); }
+  .badge--ok     { color: var(--c-ok);     border-color: var(--c-ok); }
+
+  .status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    width: fit-content;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-control);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--c-ink-2);
+  }
+
+  .more-link { margin-top: var(--sp-5); font-weight: 600; }
+
+  /* --- Пари «параметр — значення» ------------------------------------------ */
+  .kv { display: grid; gap: var(--sp-2); font-size: var(--fs-sm); }
+  .kv div { display: grid; grid-template-columns: 8.5rem 1fr; gap: var(--sp-3); }
+  .kv dt { color: var(--c-ink-2); }
+  .kv dd { font-weight: 600; }
+
+  /* --- Список з маркерами-шестикутниками (з логотипа) ----------------------- */
+  .checklist { display: grid; gap: var(--sp-3); }
+  .checklist li { display: flex; gap: var(--sp-3); }
+  .checklist li::before {
+    content: "";
+    flex: none;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-top: 0.5em;
+    background: var(--c-blue);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  }
+
+  /* --- Розгортувані блоки: нативний <details> --------------------------------- */
+  .expand { margin-top: var(--sp-5); border: 1px solid var(--c-line-soft); border-radius: var(--r-panel); background: var(--c-surface); }
+  .expand > summary, .unit__more > summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--sp-3);
+    min-height: 2.75rem;
+    padding: var(--sp-2) var(--sp-4);
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+  }
+  .expand > summary::-webkit-details-marker, .unit__more > summary::-webkit-details-marker { display: none; }
+  .expand > summary::after, .unit__more > summary::after {
+    content: "";
+    flex: none;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg) translateY(-25%);
+    transition: transform var(--dur) var(--ease-out);
+  }
+  .expand[open] > summary::after, .unit__more[open] > summary::after { transform: rotate(-135deg) translateY(-25%); }
+  .expand > :not(summary) { margin: 0 var(--sp-4) var(--sp-4); }
+
+  /* --- Сегментований перемикач (radio): фільтри і режими -------------------- */
+  .segmented { border: 0; padding: 0; }
+  .segmented__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1);
+    padding: var(--sp-1);
+    width: fit-content;
+    max-width: 100%;
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-line);
+    border-radius: 1.4rem;
+  }
+  .segmented__options input { position: absolute; opacity: 0; pointer-events: none; }
+  .segmented__options label {
+    min-height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.95rem;
+    border-radius: var(--r-control);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--c-ink-2);
+    cursor: pointer;
+    transition: background var(--dur), color var(--dur);
+  }
+  .segmented__options label:hover { color: var(--c-ink); }
+  .segmented__options input:checked + label { background: var(--c-ink); color: var(--c-bg); }
+  .segmented__options input:focus-visible + label { outline: 3px solid var(--c-blue); outline-offset: 2px; }
+
+  /* --- Вкладки (керує js/tabs.js; без JS всі панелі просто видно) ---------- */
+  .tabs__list {
+    display: flex;
+    gap: var(--sp-1);
+    border-bottom: 1px solid var(--c-line);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs__tab {
+    position: relative;
+    flex: none;
+    min-height: 2.75rem;
+    padding: var(--sp-2) var(--sp-4);
+    border: 0;
+    background: none;
+    font-weight: 700;
+    font-size: var(--fs-sm);
+    color: var(--c-ink-2);
+    cursor: pointer;
+  }
+  .tabs__tab:hover { color: var(--c-ink); }
+  .tabs__tab[aria-selected="true"] { color: var(--c-ink); }
+  .tabs__tab[aria-selected="true"]::after {
+    content: "";
+    position: absolute;
+    inset: auto var(--sp-3) -1px;
+    height: 3px;
+    background: var(--c-blue);
+  }
+  .tabs__panel { padding-top: var(--sp-5); display: grid; gap: var(--sp-4); }
+  .tabs__panel[hidden] { display: none; }
+
+  /* --- Таблиці ---------------------------------------------------------------- */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-panel);
+    background: var(--c-surface);
+  }
+  .data-table { width: 100%; font-size: var(--fs-sm); text-align: left; }
+  .data-table th, .data-table td {
+    padding: var(--sp-3) var(--sp-4);
+    border-bottom: var(--border);
+    vertical-align: top;
+  }
+  .data-table thead th { background: var(--c-surface-2); font-weight: 700; white-space: nowrap; }
+  .data-table tbody th { font-weight: 700; }
+  .data-table tbody tr:last-child > * { border-bottom: 0; }
+  .data-table tbody tr:hover { background: color-mix(in srgb, var(--c-blue) 7%, transparent); }
+  .data-table tfoot th, .data-table tfoot td { border-top: 2px solid var(--c-line); border-bottom: 0; font-weight: 800; }
+  .data-table--compact td, .data-table--compact th { padding: var(--sp-2) var(--sp-3); }
+  .data-table--matrix .yes { color: var(--c-ok); font-weight: 700; }
+  .data-table--matrix .no  { color: var(--c-ink-2); }
+
+  /* Таблиця → картки. Нижче 60rem рядок перестає бути рядком таблиці:
+     кожна клітинка стає парою «підпис — значення», а підпис береться
+     з data-label через attr(). Горизонтальна прокрутка не потрібна. */
+  @media (max-width: 59.99rem) {
+    .table-wrap:has(.data-table--cards) { border: 0; background: none; overflow: visible; }
+    .data-table--cards thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .data-table--cards, .data-table--cards tbody { display: grid; gap: var(--sp-3); }
+    .data-table--cards tr {
+      display: grid;
+      padding: var(--sp-3) var(--sp-4);
+      border: 1px solid var(--c-line-soft);
+      border-radius: var(--r-panel);
+      background: var(--c-surface);
+    }
+    .data-table--cards th, .data-table--cards td {
+      display: grid;
+      grid-template-columns: 7rem 1fr;
+      gap: var(--sp-3);
+      padding: var(--sp-1) 0;
+      border: 0;
+    }
+    .data-table--cards tbody th { padding-bottom: var(--sp-2); }
+    .data-table--cards [data-label]::before { content: attr(data-label); font-weight: 500; color: var(--c-ink-2); }
+  }
+  @media (max-width: 23.99rem) {
+    .data-table--cards th, .data-table--cards td { grid-template-columns: 1fr; gap: 0; }
+  }
+
+  /* --- Пігулка стану обладнання (ВКЛ/ВИКЛ/ТРИВОГА) ---------------------- */
+  .state-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1rem 0.5rem;
+    border-radius: var(--r-panel);
+    border: 1px solid var(--c-line);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--c-ink-2);
+  }
+  .state-pill[data-state="closed"] { color: var(--c-on-blue); background: var(--c-blue); border-color: var(--c-blue); }
+  .state-pill[data-state="tripped"] { color: var(--c-danger); border-color: var(--c-danger); }
+
+  /* Підпис рівня («Рівень 2», «Зона 1») — на кількох сторінках */
+  .tier__level { display: block; font-size: 0.75rem; font-weight: 800; color: var(--c-blue); }
+}

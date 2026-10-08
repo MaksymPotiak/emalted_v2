@@ -1,0 +1,23 @@
+/* ==========================================================================
+   Друк. Сайт друкується як акуратний буклет: без меню, кнопок і форми,
+   чорним по білому, з адресами посилань після тексту.
+   ========================================================================== */
+@layer print {
+  @media print {
+    :root {
+      --c-bg: #fff; --c-surface: #fff; --c-surface-2: #eee;
+      --c-ink: #000; --c-ink-2: #333; --c-line: #999; --c-line-soft: #ccc;
+      --c-blue: #1f45a6; --c-on-blue: #fff; --c-dead: #999;
+    }
+    body { font-size: 11pt; padding: 0; }
+    .site-header { position: static; backdrop-filter: none; }
+    .site-nav, .header-tools, .bus-progress, .skip-link,
+    .btn, .btn-row, .feeders, .cta-panel, .toc, .proto-filter, .gate, .hmi-controls, .cmd-dialog, .pnr-switch { display: none !important; }
+    .tabs__panel[hidden] { display: grid !important; }
+    details > :not(summary) { display: block; }
+    .section { padding-block: 1.2rem; }
+    .section, .unit, .step, .nameplate, figure, .io-card, .doc, tr { break-inside: avoid; }
+    main a[href^="http"]::after, main a[href^="mailto"]::after { content: " (" attr(href) ")"; font-size: 0.85em; }
+    .photo figcaption { position: static; background: none; color: #333; padding: 0.3rem 0; }
+  }
+}

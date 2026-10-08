@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Інженерні рішення — EMALTED</title>
+  <meta name="description" content="Структурна схема АСКТП, перелік обладнання, сигнали I/O, логіка керування, блокування, кібербезпека і документація демонстраційної підстанції 110/10 кВ.">
+  <meta name="author" content="Потяк М.В.">
+  <meta name="theme-color" content="#14171b">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Інженерні рішення — EMALTED">
+  <meta property="og:description" content="Структурна схема АСКТП, перелік обладнання, сигнали I/O, логіка керування, блокування, кібербезпека і документація демонстраційної підстанції 110/10 кВ.">
+  <meta property="og:image" content="img/lab-1280.webp">
+  <link rel="icon" href="img/logo-mark.svg" type="image/svg+xml">
+
+  <!-- Тема ставиться до відмальовування сторінки, щоб не було «спалаху» -->
+  <script>try{var t=localStorage.getItem('emalted-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+
+  <link rel="preload" href="fonts/unbounded-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/manrope-var.woff2" as="font" type="font/woff2" crossorigin>
+
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pnr.css">
+  <link rel="stylesheet" href="css/pages/solutions.css">
+  <link rel="stylesheet" href="css/print.css">
+  <script src="js/app.js" defer></script>
+  <script src="js/tabs.js" defer></script>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <!-- Навігація (24×24) -->
+    <symbol id="i-scheme" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+      <path d="M12 2v4M3 7h18M6 7v6M12 7v6M18 7v6M6 17v4M12 17v4M18 17v4"/>
+      <rect x="4.5" y="13" width="3" height="4"/><rect x="10.5" y="13" width="3" height="4"/><rect x="16.5" y="13" width="3" height="4"/>
+    </symbol>
+    <symbol id="i-cabinet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="5" y="2" width="14" height="20" rx="1"/><path d="M8 6h8M8 10h8M8 14h3"/><circle cx="15.5" cy="17.5" r="1.2" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="2" y="3" width="20" height="14" rx="1"/><path d="M8 21h8M12 17v4M5 13l4-4 3 3 4-5 3 3"/>
+    </symbol>
+    <!-- Компоненти системи (48×48) -->
+    <symbol id="s-ied" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5">
+      <rect x="8" y="4" width="32" height="40" rx="2"/><rect x="13" y="9" width="22" height="11"/>
+      <circle cx="16" cy="28" r="2" fill="currentColor"/><circle cx="24" cy="28" r="2"/><circle cx="32" cy="28" r="2"/><path d="M14 36h20"/>
+    </symbol>
+    <symbol id="s-rtu" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5">
+      <rect x="10" y="26" width="28" height="16" rx="2"/><path d="M24 26V12"/><circle cx="24" cy="10" r="2.5" fill="currentColor"/>
+      <path d="M17 7a10 10 0 0 0 0 9M31 7a10 10 0 0 1 0 9"/><path d="M15 34h4M23 34h4"/>
+    </symbol>
+    <symbol id="s-plc" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5">
+      <rect x="4" y="10" width="40" height="28" rx="2"/><path d="M14 10v28M24 10v28M34 10v28"/>
+      <path d="M7 16h4M7 21h4M17 16h4M17 21h4M27 16h4M37 16h4"/><circle cx="9" cy="31" r="1.5" fill="currentColor"/>
+    </symbol>
+    <symbol id="s-scada" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5">
+      <rect x="4" y="7" width="40" height="27" rx="2"/><path d="M16 41h16M24 34v7"/>
+      <path d="M10 15h28M15 15v11M24 15v11M33 15v11" stroke-linecap="square"/>
+      <rect x="12.5" y="19" width="5" height="5" fill="currentColor"/><rect x="21.5" y="19" width="5" height="5" fill="currentColor"/><rect x="30.5" y="19" width="5" height="5"/>
+    </symbol>
+    <symbol id="s-io" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5">
+      <rect x="6" y="6" width="36" height="36" rx="2"/><path d="M6 16h36M6 32h36"/>
+      <path d="M12 22v4M18 22v4M24 22v4M30 22v4M36 22v4"/><circle cx="12" cy="11" r="1.5" fill="currentColor"/>
+    </symbol>
+    <symbol id="s-network" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5">
+      <rect x="4" y="18" width="40" height="12" rx="2"/><path d="M10 24h2M16 24h2M22 24h2M28 24h2"/><circle cx="37" cy="24" r="1.6" fill="currentColor"/>
+      <path d="M12 18V8h24v10M12 30v10h24V30"/>
+    </symbol>
+    <symbol id="s-doc" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M10 4h20l10 10v30H10z"/><path d="M30 4v10h10M16 22h16M16 29h16M16 36h9"/>
+    </symbol>
+    <symbol id="s-shield" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M24 4l16 6v12c0 10-7 18-16 22C15 40 8 32 8 22V10z"/><path d="M17 24l5 5 9-10" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </svg>
+  <a class="skip-link" href="#main">Перейти до змісту</a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="index.html" aria-label="EMALTED, на головну">
+        <svg class="brand__mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+          <mask id="logo-cut-header" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
+            <rect width="100" height="100" fill="#fff"/>
+            <polygon points="9,41 58,12.7 58,20.7 9,49" fill="#000"/>
+            <polygon points="9,60 74,22.5 74,30.5 9,68" fill="#000"/>
+          </mask>
+          <g mask="url(#logo-cut-header)">
+            <polygon points="50,3 91,26.5 91,73.5 50,97 9,73.5 9,26.5" fill="var(--logo-ink)"/>
+            <polygon points="50,3 91,26.5 91,58 79,51 79,33 50,16" fill="var(--logo-steel)"/>
+            <polygon points="91,60 91,73.5 50,97 50,84" fill="var(--logo-blue)"/>
+          </g>
+        </svg>
+        <span class="brand__name">EMALTED</span>
+      </a>
+
+      <nav class="site-nav" aria-label="Основна навігація">
+        <ul class="site-nav__list" role="list">
+          <li><a class="site-nav__link" href="index.html">
+            <svg class="site-nav__icon" aria-hidden="true"><use href="#i-scheme"/></svg>Огляд
+          </a></li>
+          <li><a class="site-nav__link" href="solutions.html" aria-current="page">
+            <svg class="site-nav__icon" aria-hidden="true"><use href="#i-cabinet"/></svg>Рішення
+          </a></li>
+          <li><a class="site-nav__link" href="scada.html">
+            <svg class="site-nav__icon" aria-hidden="true"><use href="#i-monitor"/></svg>Диспетчерська
+          </a></li>
+        </ul>
+      </nav>
+
+      <div class="header-tools">
+        <button class="pnr-switch" type="button" data-pnr-toggle aria-pressed="false" aria-label="Режим ПНР: показати сітку верстки">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" stroke-dasharray="3 2"/><path d="M9 3v18M15 3v18M3 9h18"/></svg>
+          <span class="pnr-switch__text">Режим ПНР</span>
+        </button>
+        <button class="theme-switch" type="button" data-theme-toggle aria-pressed="false" aria-label="Денний режим">
+          <span class="theme-switch__text">Денний режим</span>
+          <span class="theme-switch__track"><span class="theme-switch__knob"></span></span>
+        </button>
+      </div>
+    </div>
+    <div class="bus-progress" aria-hidden="true"></div>
+  </header>
+
+  <main id="main">
+    <div class="container page-head">
+      <nav aria-label="Ви тут">
+        <ol class="breadcrumbs" role="list"><li><a href="index.html">Огляд</a></li><li aria-current="page">Рішення</li></ol>
+      </nav>
+      <h1>Інженерні рішення</h1>
+      <p class="page-head__lead">Технічний розбір демонстраційної АСКТП: від мідних кіл біля обладнання до диспетчерського центру. Кожен розділ узгоджений з іншими і з симуляцією в диспетчерській.</p>
+    </div>
+
+    <div class="container doc-layout">
+      <nav class="toc" aria-label="Розділи сторінки">
+        <p class="toc__title">Розділи</p>
+        <ol role="list"><li><a href="#architecture">Структурна схема</a></li><li><a href="#equipment">Обладнання</a></li><li><a href="#io">Сигнали I/O</a></li><li><a href="#control">Логіка керування</a></li><li><a href="#interlock">Блокування</a></li><li><a href="#security">Кібербезпека</a></li><li><a href="#docs">Документація</a></li></ol>
+      </nav>
+
+      <div class="doc-layout__body">
+        <section class="doc-section" id="architecture" aria-labelledby="architecture-title">
+          <div class="section-head">
+            <h2 id="architecture-title">Структурна схема</h2>
+            <p>Згори вниз — від обладнання до диспетчера. Оберіть протокол, щоб підсвітити, де він працює.</p>
+          </div>
+          <div class="arch-wrap">
+            <fieldset class="segmented proto-filter">
+              <legend class="visually-hidden">Підсвітити протокол</legend>
+              <div class="segmented__options"><input type="radio" name="proto" id="proto-all" checked><label for="proto-all">Усі</label><input type="radio" name="proto" id="proto-p61850"><label for="proto-p61850">IEC 61850</label><input type="radio" name="proto" id="proto-p104"><label for="proto-p104">IEC 104</label><input type="radio" name="proto" id="proto-modbus"><label for="proto-modbus">Modbus TCP</label><input type="radio" name="proto" id="proto-profinet"><label for="proto-profinet">PROFINET</label><input type="radio" name="proto" id="proto-opcua"><label for="proto-opcua">OPC UA</label></div>
+            </fieldset>
+            <div class="proto-notes" aria-live="polite"><p class="proto-note" data-note="all">Оберіть протокол, щоб побачити, які пристрої і зв’язки ним користуються.</p><p class="proto-note" data-note="p61850"><strong>IEC 61850.</strong> MMS несе стан, вимірювання й команди від IED до SCADA і RTU. GOOSE — швидкі повідомлення між самими IED: блокування і пуск захистів передаються мережею замість контрольних кабелів.</p><p class="proto-note" data-note="p104"><strong>IEC 60870-5-104.</strong> Стандарт обміну з диспетчерським центром. RTU підстанції — контрольована станція, ДЦ — контролююча. Іде через міжмережевий екран, порт TCP 2404.</p><p class="proto-note" data-note="modbus"><strong>Modbus TCP.</strong> Простий протокол для допоміжного обладнання: лічильники і ПЛК власних потреб віддають дані серверам SCADA, які виступають клієнтом.</p><p class="proto-note" data-note="profinet"><strong>PROFINET.</strong> Працює тільки всередині системи власних потреб: ПЛК циклічно обмінюється даними з віддаленими модулями I/O. В окремому VLAN, на станційну шину не виходить.</p><p class="proto-note" data-note="opcua"><strong>OPC UA.</strong> Передає архів і звіти з SCADA в корпоративну мережу через DMZ. Лише читання, з підписом і шифруванням (Sign &amp; Encrypt), порт TCP 4840.</p></div>
+            <div class="arch">
+          <div class="arch__row">
+            <div class="arch__label"><span class="tier__level">Рівень 0</span><h3>Польове обладнання</h3></div>
+            <ul class="arch__nodes" role="list"><li class="node"><strong>Вимикачі, роз’єднувачі, заземлювачі</strong><span>положення і команди</span></li><li class="node"><strong>Трансформатори струму і напруги</strong><span>вторинні кола 1 А / 100 В</span></li><li class="node"><strong>Датчики Т1</strong><span>температура, газ, рівень масла</span></li><li class="node"><strong>Вентилятори охолодження Т1</strong><span>пуск і зупинка</span></li></ul>
+          </div>
+          <div class="arch__link">
+            <p class="arch__medium">Мідні кола: DI/DO 220 В DC, аналогові 4–20 мА, вторинні кола ТС і ТН</p>
+            <ul class="arch__chips" role="list"></ul>
+          </div>
+          <div class="arch__row">
+            <div class="arch__label"><span class="tier__level">Рівень 1</span><h3>Приєднання</h3><p class="arch__note">Тут же горизонтальні зв’язки: GOOSE між IED і PROFINET між ПЛК та I/O.</p></div>
+            <ul class="arch__nodes" role="list"><li class="node" data-proto="p61850"><strong>IED захисту Л-1 і Т1</strong><span>захист, керування Q1, РПН</span></li><li class="node" data-proto="p61850"><strong>IED / BCU приєднань 10 кВ ×3</strong><span>МСЗ, керування Q11–Q13</span></li><li class="node" data-proto="profinet modbus"><strong>ПЛК власних потреб</strong><span>АВР 0,4 кВ, охолодження Т1</span></li><li class="node" data-proto="profinet"><strong>Віддалені модулі I/O ×4</strong><span>DI, DO, AI, AO</span></li><li class="node" data-proto="modbus"><strong>Лічильники енергії ×5</strong><span>облік і якість енергії</span></li></ul>
+          </div>
+          <div class="arch__link">
+            <p class="arch__medium">Промисловий Ethernet: LAN A + LAN B за PRP, оптика між шафами, окремі VLAN</p>
+            <ul class="arch__chips" role="list"><li class="link-chip" data-proto="p61850"><span class="badge badge--strong">GOOSE</span>IED ↔ IED, блокування</li><li class="link-chip" data-proto="profinet"><span class="badge badge--strong">PROFINET</span>ПЛК ↔ віддалені I/O</li><li class="link-chip" data-proto="p61850"><span class="badge badge--strong">IEC 61850 MMS</span>IED → SCADA, RTU</li><li class="link-chip" data-proto="modbus"><span class="badge badge--strong">Modbus TCP</span>ПЛК, лічильники → SCADA</li></ul>
+          </div>
+          <div class="arch__row">
+            <div class="arch__label"><span class="tier__level">Рівень 2</span><h3>Підстанція</h3><p class="arch__note">RTU стоїть тут, а не біля обладнання: він бере дані вже з мережі підстанції.</p></div>
+            <ul class="arch__nodes" role="list"><li class="node" data-proto="p61850 modbus opcua"><strong>Сервери SCADA ×2</strong><span>гарячий резерв, архів</span></li><li class="node"><strong>АРМ оператора ×2</strong><span>мнемосхема, тривоги</span></li><li class="node" data-proto="p61850 p104"><strong>RTU / шлюз телемеханіки</strong><span>обмін з ДЦ</span></li><li class="node"><strong>Сервер часу GNSS</strong><span>SNTP для всіх пристроїв</span></li></ul>
+          </div>
+          <div class="arch__link">
+            <p class="arch__medium">Межа зон: промисловий міжмережевий екран</p>
+            <ul class="arch__chips" role="list"><li class="link-chip" data-proto="p104"><span class="badge badge--strong">IEC 60870-5-104</span>RTU → ДЦ, TCP 2404</li><li class="link-chip" data-proto="opcua"><span class="badge badge--strong">OPC UA</span>SCADA → DMZ, TCP 4840</li></ul>
+          </div>
+          <div class="arch__row">
+            <div class="arch__label"><span class="tier__level">Рівень 3</span><h3>Диспетчерський і корпоративний</h3></div>
+            <ul class="arch__nodes" role="list"><li class="node" data-proto="p104"><strong>Диспетчерський центр</strong><span>ТС, ТВ, ТК</span></li><li class="node" data-proto="opcua"><strong>Корпоративна мережа (DMZ)</strong><span>звіти, лише читання</span></li></ul>
+          </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="equipment" aria-labelledby="equipment-title">
+          <div class="section-head">
+            <h2 id="equipment-title">Перелік обладнання</h2>
+            <p>На широкому екрані — таблиця. На телефоні кожен рядок стає карткою, щоб нічого не довелося гортати вбік.</p>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table data-table--cards">
+              <caption class="visually-hidden">Перелік обладнання демонстраційної системи</caption>
+              <thead><tr><th scope="col">Пристрій</th><th scope="col">Функція</th><th scope="col">Інтерфейс</th><th scope="col">Протокол</th><th scope="col">Роль</th></tr></thead>
+              <tbody>
+              <tr><th scope="row" data-label="Пристрій">IED захисту лінії Л-1</th><td data-label="Функція">Дистанційний захист, АПВ, керування Q1</td><td data-label="Інтерфейс">2× Ethernet (LAN A/B), DI/DO</td><td data-label="Протокол">IEC 61850 MMS, GOOSE</td><td data-label="Роль">Сервер MMS, видавець GOOSE</td></tr>
+              <tr><th scope="row" data-label="Пристрій">IED захисту трансформатора Т1</th><td data-label="Функція">Диференційний і газовий захист, керування РПН</td><td data-label="Інтерфейс">2× Ethernet, DI/DO, AI</td><td data-label="Протокол">IEC 61850 MMS, GOOSE</td><td data-label="Роль">Сервер MMS, видавець GOOSE</td></tr>
+              <tr><th scope="row" data-label="Пристрій">IED / BCU приєднань 10 кВ ×3</th><td data-label="Функція">МСЗ, керування Q11–Q13, блокування</td><td data-label="Інтерфейс">2× Ethernet, DI/DO</td><td data-label="Протокол">IEC 61850 MMS, GOOSE</td><td data-label="Роль">Сервер MMS, видавець і підписник GOOSE</td></tr>
+              <tr><th scope="row" data-label="Пристрій">ПЛК власних потреб</th><td data-label="Функція">АВР 0,4 кВ, охолодження Т1, обігрів шаф</td><td data-label="Інтерфейс">Ethernet, PROFINET</td><td data-label="Протокол">PROFINET, Modbus TCP</td><td data-label="Роль">Контролер PROFINET IO, сервер Modbus</td></tr>
+              <tr><th scope="row" data-label="Пристрій">Віддалені модулі I/O ×4</th><td data-label="Функція">Збір DI/AI, видача DO/AO</td><td data-label="Інтерфейс">PROFINET, клеми</td><td data-label="Протокол">PROFINET IO</td><td data-label="Роль">Пристрій PROFINET IO</td></tr>
+              <tr><th scope="row" data-label="Пристрій">Лічильники енергії ×5</th><td data-label="Функція">Облік і показники якості енергії</td><td data-label="Інтерфейс">Ethernet</td><td data-label="Протокол">Modbus TCP</td><td data-label="Роль">Сервер Modbus</td></tr>
+              <tr><th scope="row" data-label="Пристрій">RTU / шлюз телемеханіки</th><td data-label="Функція">Обмін з ДЦ, перетворення протоколів</td><td data-label="Інтерфейс">2× LAN, 2 канали до ДЦ</td><td data-label="Протокол">IEC 61850, IEC 60870-5-104</td><td data-label="Роль">Клієнт MMS, контрольована станція 104</td></tr>
+              <tr><th scope="row" data-label="Пристрій">Сервери SCADA ×2</th><td data-label="Функція">Збір даних, тривоги, архів</td><td data-label="Інтерфейс">2× Ethernet</td><td data-label="Протокол">IEC 61850, Modbus TCP, OPC UA</td><td data-label="Роль">Клієнт MMS і Modbus, сервер OPC UA</td></tr>
+              <tr><th scope="row" data-label="Пристрій">АРМ оператора ×2</th><td data-label="Функція">Мнемосхема, керування, журнал</td><td data-label="Інтерфейс">Ethernet</td><td data-label="Протокол">Клієнт SCADA</td><td data-label="Роль">Людино-машинний інтерфейс</td></tr>
+              <tr><th scope="row" data-label="Пристрій">Сервер часу GNSS</th><td data-label="Функція">Синхронізація годинників</td><td data-label="Інтерфейс">Ethernet, антена GNSS</td><td data-label="Протокол">SNTP</td><td data-label="Роль">Джерело часу</td></tr>
+              <tr><th scope="row" data-label="Пристрій">Комутатори LAN A і LAN B</th><td data-label="Функція">Станційна шина, VLAN</td><td data-label="Інтерфейс">Оптика 1 Гбіт/с, мідь</td><td data-label="Протокол">PRP, IEC 62439-3</td><td data-label="Роль">Мережева інфраструктура</td></tr>
+              <tr><th scope="row" data-label="Пристрій">Промисловий міжмережевий екран</th><td data-label="Функція">Межа зон, фільтрація трафіку</td><td data-label="Інтерфейс">Ethernet</td><td data-label="Протокол">Правила для IEC 104 і OPC UA</td><td data-label="Роль">Межа зон IEC 62443</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="doc-section" id="io" aria-labelledby="io-title">
+          <div class="section-head">
+            <h2 id="io-title">Сигнали вводу-виводу</h2>
+            <p>400 фізичних сигналів. У модулях закладено резерв близько 20% на розширення без заміни обладнання.</p>
+          </div>
+          <div class="io-grid">
+          <article class="io-card">
+            <h3><abbr title="Дискретні входи">DI</abbr></h3>
+            <p class="io-card__count">256<small>з 320</small></p>
+            <div class="io-card__bar" style="--used:80%" role="img" aria-label="Використано 80% каналів"></div>
+            <p class="io-card__type">220 В DC</p>
+            <p>Положення вимикачів, роз’єднувачів, заземлювачів; спрацювання захистів; автомати кіл; двері шаф</p>
+          </article>
+          <article class="io-card">
+            <h3><abbr title="Дискретні виходи">DO</abbr></h3>
+            <p class="io-card__count">64<small>з 80</small></p>
+            <div class="io-card__bar" style="--used:80%" role="img" aria-label="Використано 80% каналів"></div>
+            <p class="io-card__type">Реле, 220 В DC</p>
+            <p>Команди увімкнути/вимкнути, керування РПН, пуск вентиляторів, скидання сигналізації</p>
+          </article>
+          <article class="io-card">
+            <h3><abbr title="Аналогові входи">AI</abbr></h3>
+            <p class="io-card__count">72<small>з 88</small></p>
+            <div class="io-card__bar" style="--used:82%" role="img" aria-label="Використано 82% каналів"></div>
+            <p class="io-card__type">4–20 мА</p>
+            <p>Температура масла й обмоток Т1, рівень масла, напруга АКБ, температура в шафах</p>
+          </article>
+          <article class="io-card">
+            <h3><abbr title="Аналогові виходи">AO</abbr></h3>
+            <p class="io-card__count">8<small>з 12</small></p>
+            <div class="io-card__bar" style="--used:67%" role="img" aria-label="Використано 67% каналів"></div>
+            <p class="io-card__type">4–20 мА</p>
+            <p>Задання частоти обертання вентиляторів охолодження Т1, резерв</p>
+          </article>
+          </div>
+          <details class="expand">
+            <summary>Розподіл сигналів за підсистемами</summary>
+            <div class="table-wrap">
+              <table class="data-table data-table--compact">
+                <caption class="visually-hidden">Кількість сигналів I/O за підсистемами</caption>
+                <thead><tr><th scope="col">Підсистема</th><th scope="col">DI</th><th scope="col">DO</th><th scope="col">AI</th><th scope="col">AO</th><th scope="col">Разом</th></tr></thead>
+                <tbody>
+              <tr><th scope="row" data-label="Підсистема">Лінія 110 кВ, Л-1</th><td data-label="DI">40</td><td data-label="DO">12</td><td data-label="AI">6</td><td data-label="AO">0</td><td data-label="Разом">58</td></tr>
+              <tr><th scope="row" data-label="Підсистема">Трансформатор Т1</th><td data-label="DI">56</td><td data-label="DO">14</td><td data-label="AI">18</td><td data-label="AO">2</td><td data-label="Разом">90</td></tr>
+              <tr><th scope="row" data-label="Підсистема">Ввід 10 кВ, Q10</th><td data-label="DI">28</td><td data-label="DO">6</td><td data-label="AI">4</td><td data-label="AO">0</td><td data-label="Разом">38</td></tr>
+              <tr><th scope="row" data-label="Підсистема">Приєднання 10 кВ ×3</th><td data-label="DI">72</td><td data-label="DO">18</td><td data-label="AI">12</td><td data-label="AO">0</td><td data-label="Разом">102</td></tr>
+              <tr><th scope="row" data-label="Підсистема">Власні потреби (ПЛК)</th><td data-label="DI">44</td><td data-label="DO">10</td><td data-label="AI">24</td><td data-label="AO">6</td><td data-label="Разом">84</td></tr>
+              <tr><th scope="row" data-label="Підсистема">Загальнопідстанційні</th><td data-label="DI">16</td><td data-label="DO">4</td><td data-label="AI">8</td><td data-label="AO">0</td><td data-label="Разом">28</td></tr>
+                </tbody>
+                <tfoot><tr><th scope="row">Усього</th><td>256</td><td>64</td><td>72</td><td>8</td><td>400</td></tr></tfoot>
+              </table>
+            </div>
+          </details>
+        </section>
+
+        <section class="doc-section" id="control" aria-labelledby="control-title">
+          <div class="section-head">
+            <h2 id="control-title">Логіка керування</h2>
+            <p>Хто має право подати команду, хто вирішує — алгоритм чи людина, і що перемагає, коли команди суперечать одна одній.</p>
+          </div>
+
+          <div class="tabs" data-tabs>
+            <div class="tabs__list" role="tablist" aria-label="Логіка керування">
+              <button class="tabs__tab" role="tab" id="tab-place" aria-controls="panel-place" aria-selected="true">LOCAL / REMOTE</button>
+              <button class="tabs__tab" role="tab" id="tab-auto" aria-controls="panel-auto" aria-selected="false" tabindex="-1">AUTO / MANUAL</button>
+              <button class="tabs__tab" role="tab" id="tab-priority" aria-controls="panel-priority" aria-selected="false" tabindex="-1">Пріоритет команд</button>
+            </div>
+
+            <div class="tabs__panel" role="tabpanel" id="panel-place" aria-labelledby="tab-place" tabindex="0">
+              <p>Ключ на дверцятах шафи визначає, звідки можна керувати вимикачем. Одночасно керувати з двох місць неможливо.</p>
+              <div class="table-wrap">
+                <table class="data-table data-table--compact data-table--matrix">
+                  <caption class="visually-hidden">Хто може подати команду в кожному режимі</caption>
+                  <thead><tr><th scope="col">Звідки команда</th><th scope="col">LOCAL</th><th scope="col">REMOTE</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">Кнопки на шафі</th><td class="yes">Так</td><td class="no">Ні</td></tr>
+                    <tr><th scope="row">АРМ оператора SCADA</th><td class="no">Ні</td><td class="yes">Так</td></tr>
+                    <tr><th scope="row">Диспетчерський центр</th><td class="no">Ні</td><td class="yes">Так, якщо підстанція передала керування</td></tr>
+                    <tr><th scope="row">Релейний захист</th><td class="yes">Завжди</td><td class="yes">Завжди</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="tabs__panel" role="tabpanel" id="panel-auto" aria-labelledby="tab-auto" tabindex="0">
+              <p>Приклад — охолодження трансформатора Т1, яким керує ПЛК власних потреб.</p>
+              <div class="statechart">
+                <div class="state"><strong>STOP</strong><span>вентилятори зупинені</span></div>
+                <div class="state-arrows">
+                  <p><span class="badge">AUTO</span> t масла &gt; 65 °C → START</p>
+                  <p><span class="badge">AUTO</span> t масла &lt; 55 °C → STOP</p>
+                </div>
+                <div class="state state--on"><strong>RUN</strong><span>вентилятори працюють</span></div>
+              </div>
+              <ul class="checklist" role="list">
+                <li><strong>AUTO:</strong> ПЛК сам запускає і зупиняє вентилятори. Різниця 10 °C (гістерезис) не дає їм вмикатися й вимикатися щохвилини.</li>
+                <li><strong>MANUAL:</strong> оператор подає START або STOP, автоматика не втручається.</li>
+                <li>Незалежно від режиму: при t масла &gt; 85 °C — тривога ALARM для оператора.</li>
+              </ul>
+            </div>
+
+            <div class="tabs__panel" role="tabpanel" id="panel-priority" aria-labelledby="tab-priority" tabindex="0">
+              <p>Від найсильнішого до найслабшого. Вищий рівень завжди перекриває нижчий.</p>
+              <ol class="priority" role="list">
+                <li><span class="badge badge--danger">EMERGENCY</span>Аварійне відключення кнопкою або від захисту. Діє завжди.</li>
+                <li><span class="badge badge--danger">TRIP</span>Команда релейного захисту. Не залежить від режимів керування.</li>
+                <li><span class="badge badge--alarm">INTERLOCK</span>Блокування не пропускає небезпечну операцію навіть від оператора.</li>
+                <li><span class="badge badge--ok">PERMISSIVE</span>Дозвіл: усі умови виконані, команда може пройти.</li>
+                <li><span class="badge">LOCAL / REMOTE</span>Визначає, хто саме має право командувати.</li>
+                <li><span class="badge">AUTO / MANUAL</span>Визначає, хто вирішує: алгоритм чи людина.</li>
+                <li><span class="badge">START / STOP</span>Звичайна команда оператора.</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="interlock" aria-labelledby="interlock-title">
+          <div class="section-head">
+            <h2 id="interlock-title">Блокування вимикача 10 кВ</h2>
+            <p>Вмикання вимикачів Q11–Q13 дозволене лише тоді, коли виконані всі сім умов — логічне «І». Зніміть будь-яку галочку, і дозвіл зникне. Ця схема працює на чистому CSS.</p>
+          </div>
+
+          <form class="gate" aria-label="Інтерактивна схема блокування">
+            <ul class="gate__inputs" role="list">
+              <li class="gate-input">
+                <input type="checkbox" id="il-estop" checked>
+                <label for="il-estop"><span class="lamp"></span><span><strong>Немає аварійного відключення</strong><small>EMERGENCY не активний</small></span></label>
+              </li>
+              <li class="gate-input">
+                <input type="checkbox" id="il-prot" checked>
+                <label for="il-prot"><span class="lamp"></span><span><strong>Захист приєднання справний</strong><small>IED без внутрішньої несправності</small></span></label>
+              </li>
+              <li class="gate-input">
+                <input type="checkbox" id="il-cart" checked>
+                <label for="il-cart"><span class="lamp"></span><span><strong>Візок вимикача в робочому положенні</strong><small>Кінцевий вимикач візка</small></span></label>
+              </li>
+              <li class="gate-input">
+                <input type="checkbox" id="il-earth" checked>
+                <label for="il-earth"><span class="lamp"></span><span><strong>Заземлювальний ніж QE вимкнений</strong><small>Подвійний телесигнал положення</small></span></label>
+              </li>
+              <li class="gate-input">
+                <input type="checkbox" id="il-remote" checked>
+                <label for="il-remote"><span class="lamp"></span><span><strong>Режим керування REMOTE</strong><small>Ключ на шафі в положенні «Дистанційне»</small></span></label>
+              </li>
+              <li class="gate-input">
+                <input type="checkbox" id="il-volt" checked>
+                <label for="il-volt"><span class="lamp"></span><span><strong>Напруга на секції шин у нормі</strong><small>U ≥ 0,9 Uном, усі три фази</small></span></label>
+              </li>
+              <li class="gate-input">
+                <input type="checkbox" id="il-spring" checked>
+                <label for="il-spring"><span class="lamp"></span><span><strong>Пружину приводу заведено</strong><small>Привод готовий до вмикання</small></span></label>
+              </li>
+            </ul>
+            <div class="gate__and" aria-hidden="true"><span>&amp;</span></div>
+            <div class="gate__output">
+              <p class="gate__result gate__result--ok"><span class="lamp lamp--on"></span>Дозвіл на вмикання</p>
+              <p class="gate__result gate__result--blocked"><span class="lamp lamp--alarm"></span>Вмикання заблоковано</p>
+              <p class="gate__hint">Відключення блокуванням не обмежується: вимкнути вимикач можна завжди.</p>
+              <button class="btn btn--ghost" type="reset">Повернути всі умови</button>
+            </div>
+          </form>
+          <p class="more-link">Ці самі умови перевіряє <a href="scada.html">диспетчерська</a> перед кожною командою «Увімкнути».</p>
+        </section>
+
+        <section class="doc-section" id="security" aria-labelledby="security-title">
+          <div class="section-head">
+            <h2 id="security-title">Кібербезпека</h2>
+            <p>Підхід за IEC 62443: мережу ділять на зони, між зонами — контрольовані канали.</p>
+          </div>
+          <ol class="zones" role="list">
+            <li class="zone"><span class="tier__level">Зона 1</span><strong>Приєднання</strong><span>IED, ПЛК, I/O</span></li>
+            <li class="zone"><span class="tier__level">Зона 2</span><strong>Підстанція</strong><span>SCADA, АРМ, RTU</span></li>
+            <li class="zone zone--fw"><span class="tier__level">Межа</span><strong>Міжмережевий екран</strong><span>лише дозволені потоки</span></li>
+            <li class="zone"><span class="tier__level">Зона 3</span><strong>DMZ і зовнішні</strong><span>ДЦ, корпоративна мережа</span></li>
+          </ol>
+          <ul class="sec-grid" role="list">
+          <li class="sec-item"><h3>Сегментація мережі</h3><p>Зони приєднань, підстанції і DMZ розділені. PROFINET і станційна шина — в окремих VLAN.</p></li>
+          <li class="sec-item"><h3>Контрольований доступ</h3><p>Ролі: оператор керує, інженер змінює налаштування, адміністратор керує обліковими записами.</p></li>
+          <li class="sec-item"><h3>Автентифікація</h3><p>Тільки персональні облікові записи, без спільних паролів. Віддалений доступ — з другим фактором.</p></li>
+          <li class="sec-item"><h3>Журналювання</h3><p>Входи, команди і зміни конфігурації йдуть у центральний журнал з точним часом від GNSS.</p></li>
+          <li class="sec-item"><h3>Промисловий міжмережевий екран</h3><p>Між зонами пропускаються лише потрібні протоколи і адреси. Усе інше заборонено за замовчуванням.</p></li>
+          <li class="sec-item"><h3>Захищені протоколи</h3><p>OPC UA з підписом і шифруванням, HTTPS і SSH для налаштування пристроїв. IEC 62351 — там, де його підтримує обладнання.</p></li>
+          </ul>
+          <details class="expand">
+            <summary>Правила міжмережевого екрана</summary>
+            <div class="table-wrap">
+              <table class="data-table data-table--compact data-table--cards">
+                <caption class="visually-hidden">Правила міжмережевого екрана</caption>
+                <thead><tr><th scope="col">Дія</th><th scope="col">Напрямок</th><th scope="col">Порт</th><th scope="col">Протокол</th></tr></thead>
+                <tbody>
+              <tr class="fw-allow"><th scope="row" data-label="Дія">Дозволено</th><td data-label="Напрямок">RTU → диспетчерський центр</td><td data-label="Порт">TCP 2404</td><td data-label="Протокол">IEC 60870-5-104</td></tr>
+              <tr class="fw-allow"><th scope="row" data-label="Дія">Дозволено</th><td data-label="Напрямок">SCADA → сервер у DMZ</td><td data-label="Порт">TCP 4840</td><td data-label="Протокол">OPC UA, Sign &amp; Encrypt</td></tr>
+              <tr class="fw-allow"><th scope="row" data-label="Дія">Дозволено</th><td data-label="Напрямок">АРМ інженера → пристрої</td><td data-label="Порт">TCP 22, 443</td><td data-label="Протокол">SSH, HTTPS, лише з зони підстанції</td></tr>
+              <tr class="fw-deny"><th scope="row" data-label="Дія">Заборонено</th><td data-label="Напрямок">Будь-яке інше з’єднання</td><td data-label="Порт">усі</td><td data-label="Протокол">Правило за замовчуванням</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </section>
+
+        <section class="doc-section" id="docs" aria-labelledby="docs-title">
+          <div class="section-head">
+            <h2 id="docs-title">Інженерна документація</h2>
+            <p>Що входить у комплект проєкту. Документи пов’язані між собою: перелік тривог посилається на перелік сигналів, протоколи FAT — на обидва.</p>
+          </div>
+          <ul class="docs" role="list">
+          <li class="doc">
+            <svg class="doc__icon" aria-hidden="true"><use href="#s-doc"/></svg>
+            <div>
+              <p class="doc__code">IO-01 <span class="badge">XLSX</span></p>
+              <h3>Перелік сигналів</h3>
+              <p>Усі 400 сигналів: адреса, тип, клема, джерело, текст події, пріоритет тривоги.</p>
+            </div>
+          </li>
+          <li class="doc">
+            <svg class="doc__icon" aria-hidden="true"><use href="#s-doc"/></svg>
+            <div>
+              <p class="doc__code">EQ-01 <span class="badge">XLSX</span></p>
+              <h3>Перелік обладнання</h3>
+              <p>Кожен пристрій: тип, кількість, шафа, живлення, версія прошивки.</p>
+            </div>
+          </li>
+          <li class="doc">
+            <svg class="doc__icon" aria-hidden="true"><use href="#s-doc"/></svg>
+            <div>
+              <p class="doc__code">NT-01 <span class="badge">PDF</span></p>
+              <h3>Топологія мережі</h3>
+              <p>Схема LAN A і LAN B, IP-план, VLAN, порти комутаторів, правила екрана.</p>
+            </div>
+          </li>
+          <li class="doc">
+            <svg class="doc__icon" aria-hidden="true"><use href="#s-doc"/></svg>
+            <div>
+              <p class="doc__code">FD-01 <span class="badge">DOCX</span></p>
+              <h3>Функціональний опис</h3>
+              <p>Що робить система і в якому режимі: керування, блокування, АВР, охолодження.</p>
+            </div>
+          </li>
+          <li class="doc">
+            <svg class="doc__icon" aria-hidden="true"><use href="#s-doc"/></svg>
+            <div>
+              <p class="doc__code">AL-01 <span class="badge">XLSX</span></p>
+              <h3>Перелік тривог</h3>
+              <p>Пріоритет кожної тривоги, текст для оператора і що він має зробити.</p>
+            </div>
+          </li>
+          <li class="doc">
+            <svg class="doc__icon" aria-hidden="true"><use href="#s-doc"/></svg>
+            <div>
+              <p class="doc__code">CL-01 <span class="badge">PDF</span></p>
+              <h3>Логіка керування</h3>
+              <p>Логічні схеми блокувань і алгоритмів, програми ПЛК мовою ST.</p>
+            </div>
+          </li>
+          <li class="doc">
+            <svg class="doc__icon" aria-hidden="true"><use href="#s-doc"/></svg>
+            <div>
+              <p class="doc__code">TP-01 <span class="badge">DOCX</span></p>
+              <h3>Протоколи випробувань</h3>
+              <p>Програми і результати FAT і SAT: кожен сигнал від клеми до ДЦ.</p>
+            </div>
+          </li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div class="pnr-overlay" data-pnr-overlay aria-hidden="true"></div>
+  <div class="pnr-panel" data-pnr-panel hidden role="status">
+    <p class="pnr-panel__title"><span class="lamp lamp--alarm"></span>Режим ПНР</p>
+    <dl>
+      <div><dt>Ширина вікна</dt><dd data-pnr-width>—</dd></div>
+      <div><dt>Точка зламу</dt><dd class="pnr-bp"></dd></div>
+      <div><dt>Grid-контейнерів</dt><dd data-pnr-grid>—</dd></div>
+      <div><dt>Flex-контейнерів</dt><dd data-pnr-flex>—</dd></div>
+    </dl>
+    <p class="pnr-panel__legend"><span class="pnr-key-grid">Grid</span><span class="pnr-key-flex">Flex</span></p>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a class="brand" href="index.html" aria-label="EMALTED, на головну">
+            <svg class="brand__mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+          <mask id="logo-cut-footer" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
+            <rect width="100" height="100" fill="#fff"/>
+            <polygon points="9,41 58,12.7 58,20.7 9,49" fill="#000"/>
+            <polygon points="9,60 74,22.5 74,30.5 9,68" fill="#000"/>
+          </mask>
+          <g mask="url(#logo-cut-footer)">
+            <polygon points="50,3 91,26.5 91,73.5 50,97 9,73.5 9,26.5" fill="var(--logo-ink)"/>
+            <polygon points="50,3 91,26.5 91,58 79,51 79,33 50,16" fill="var(--logo-steel)"/>
+            <polygon points="91,60 91,73.5 50,97 50,84" fill="var(--logo-blue)"/>
+          </g>
+        </svg>
+            <span class="brand__name">EMALTED</span>
+          </a>
+          <p>Демонстраційний інженерний вебпроєкт: АСКТП умовної підстанції 110/10 кВ від польового рівня до диспетчерського центру.</p>
+          <p class="footer-note">EMALTED — вигаданий бренд. Компанія, об’єкт, обладнання і всі значення на сайті є навчальними прикладами, а не реальними даними.</p>
+        </div>
+        <nav aria-label="Сторінки сайту">
+          <h2>Сторінки</h2>
+          <ul role="list">
+            <li><a href="index.html">Огляд системи</a></li>
+            <li><a href="solutions.html">Інженерні рішення</a></li>
+            <li><a href="scada.html">Диспетчерська (симуляція)</a></li>
+          </ul>
+        </nav>
+        <div>
+          <h2>Проєкт</h2>
+          <ul role="list">
+            <li>Автор: Потяк М.В., група ТА-43</li>
+            <li>КПІ ім. Ігоря Сікорського</li>
+            <li>Дисципліна: Вебтехнології</li>
+            <li><a href="https://github.com/MaksymPotiak/emalted" rel="noopener">Код на GitHub</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2>Ревізія</h2>
+          <dl class="revision">
+            <div><dt>Документ</dt><dd>ЕМ-WEB-001</dd></div>
+            <div><dt>Ревізія</dt><dd>2.0</dd></div>
+            <div><dt>Дата</dt><dd><time datetime="2026-10-07">07.10.2026</time></dd></div>
+            <div><dt>Статус</dt><dd>Навчальний</dd></div>
+          </dl>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span data-year>2026</span> Потяк М.В.</span>
+        <span>HTML, CSS, JavaScript без фреймворків</span>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

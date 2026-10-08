@@ -1,0 +1,101 @@
+/* ==========================================================================
+   EMALTED — дизайн-токени
+   Порядок шарів каскаду задаємо один раз, тут. Далі кожен файл кладе
+   свої правила у свій шар, і специфічність між файлами більше не воює.
+   ========================================================================== */
+@layer reset, tokens, base, layout, components, pages, utilities, print;
+
+@layer tokens {
+  :root {
+    color-scheme: dark;
+
+    /* --- Палітра: нічний режим (за замовчуванням) --------------------------
+       Ідея з ISA-101 (high-performance HMI): спокійний сірий фон, а колір
+       з'являється лише там, де він щось означає:
+         синій       — під напругою / активний елемент
+         бурштиновий — попередження (WARNING)
+         червоний    — аварія (ALARM)
+         зелений     — лише «дозволено / в нормі» там, де це треба показати. */
+    --c-bg:        #14171b;
+    --c-surface:   #1c2025;
+    --c-surface-2: #262b31;
+    --c-line:      #48505a;
+    --c-line-soft: #323840;
+    --c-ink:       #e4e7ea;
+    --c-ink-2:     #a3abb4;
+    --c-steel:     #8c939b;
+    --c-blue:      #6f93f2;
+    --c-blue-hi:   #93afff;
+    --c-on-blue:   #0e1530;
+    --c-dead:      #5b636c;
+    --c-alarm:     #f0b429;
+    --c-danger:    #f2665b;
+    --c-ok:        #5cc98a;
+
+    /* --- Логотип ------------------------------------------------------- */
+    --logo-ink:   var(--c-ink);
+    --logo-steel: var(--c-steel);
+    --logo-blue:  var(--c-blue);
+
+    /* --- Типографіка ---------------------------------------------------
+       Unbounded — широкий геометричний гротеск, перегукується з
+       розтягнутими літерами логотипа. Manrope — текст і цифри. */
+    --f-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+    --f-text:    "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+    /* Плавна шкала: clamp(мін, залежність від ширини екрана, макс) */
+    --fs-sm:   clamp(0.82rem, 0.79rem + 0.1vw, 0.88rem);
+    --fs-base: clamp(1rem, 0.96rem + 0.2vw, 1.09rem);
+    --fs-md:   clamp(1.15rem, 1.06rem + 0.4vw, 1.35rem);
+    --fs-lg:   clamp(1.3rem, 1.15rem + 0.7vw, 1.75rem);
+    --fs-xl:   clamp(1.6rem, 1.25rem + 1.6vw, 2.6rem);
+    --fs-2xl:  clamp(1.85rem, 1.25rem + 2.2vw, 3.1rem);
+
+    /* --- Простір і сітка ------------------------------------------------- */
+    --sp-1: 0.25rem;
+    --sp-2: 0.5rem;
+    --sp-3: 0.75rem;
+    --sp-4: 1rem;
+    --sp-5: 1.5rem;
+    --sp-6: 2rem;
+    --sp-7: 3rem;
+    --sp-8: clamp(3.5rem, 2.5rem + 4vw, 6.5rem);
+
+    --gutter:    clamp(1rem, 0.6rem + 2vw, 2.5rem);
+    --max-width: 78rem;
+    --measure:   62ch;
+
+    /* Радіуси свідомо різні: панелі майже прямі, як корпус шафи,
+       перемикачі — круглі, як справжні тумблери. */
+    --r-panel: 3px;
+    --r-control: 999px;
+
+    --border: 1px solid var(--c-line-soft);
+    --header-h: 4.25rem;
+    --tabbar-h: 4rem;
+
+    --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --dur: 220ms;
+  }
+
+  /* --- Денний режим --------------------------------------------------------
+     За замовчуванням сайт темний, як диспетчерська. Світлу тему вмикає
+     перемикач у шапці (data-theme="light" на <html>). */
+  :root[data-theme="light"] {
+    --c-bg:        #e3e6e9;
+    --c-surface:   #f3f4f5;
+    --c-surface-2: #d3d8dc;
+    --c-line:      #a4abb3;
+    --c-line-soft: #c4c9ce;
+    --c-ink:       #1d2024;
+    --c-ink-2:     #4b5159;
+    --c-steel:     #5a5f66;
+    --c-blue:      #1f45a6;
+    --c-blue-hi:   #2f5cd0;
+    --c-on-blue:   #ffffff;
+    --c-dead:      #8a9199;
+    --c-alarm:     #a86f00;
+    --c-danger:    #c4362c;
+    --c-ok:        #2e7a4c;
+  }
+}

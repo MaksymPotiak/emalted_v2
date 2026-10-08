@@ -1,0 +1,28 @@
+/* ==========================================================================
+   404 — «Аварійне відключення»
+   ========================================================================== */
+@layer pages {
+  .trip {
+    display: grid;
+    gap: var(--sp-6);
+    align-items: center;
+    padding-block: var(--sp-8);
+  }
+  .trip__scheme { max-width: 22rem; width: 100%; color: var(--c-dead); }
+  .trip__scheme .live { stroke: var(--c-blue); }
+  .trip__scheme .open { stroke: var(--c-alarm); }
+  .trip__code {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-weight: 700;
+    color: var(--c-alarm);
+  }
+  .trip__text { display: grid; gap: var(--sp-4); }
+  .trip__text p { color: var(--c-ink-2); font-size: var(--fs-md); }
+
+  @media (min-width: 60rem) {
+    .trip { grid-template-columns: 1fr 1.4fr; min-height: calc(100svh - var(--header-h) - 12rem); }
+    .trip__scheme { justify-self: center; max-width: 26rem; }
+  }
+}
